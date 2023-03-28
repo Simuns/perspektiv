@@ -20,7 +20,7 @@ My goal was to write something beautiful with as little code as possible. Althou
 # installation guides
 ## Install via docker
 
-* build container `docker build github.com/simuns/skrivarin`
+* build container `docker build -t skrivarin:latest github.com/simuns/skrivarin`
 * activating container `docker run --rm -p 5000:5000 skrivarin`
 
 ## Install via pipenv

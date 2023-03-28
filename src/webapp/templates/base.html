@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" href="{{ url_for('static', filename='layout.css') }}">
+        <meta charset="UTF-8">
+        <meta http-equiv="cache-control" content="no-cache" />
+    {% block head %}
+    {% endblock %}
+    </head>
+    <body>
+        <header>
+            {% block header %}
+            {% endblock %}
+        </header>
+        <div class="main">
+            <aside class="left">
+                {% block left %}
+                {% endblock %}
+            </aside>
+            <main>
+                {% block content %}
+                {% endblock %}
+            </main>
+            <aside class="right">
+                {% block right %}
+                    
+                {% endblock %}
+            </aside>
+        </div>
+        <footer>
+            {% block footer %}
+            {% endblock %}
+        </footer>
+    </body>
+</html>

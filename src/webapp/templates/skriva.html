@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block head %}
+        <title>Skriva lesarabræv</title>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>    
+        <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+        <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='skriva.css') }}">
+{% endblock %}
+
+
+{% block header %}
+            <h1>skriva lesarabræv</h1>
+            <a href="/">Heim</a>
+{% endblock %}
+
+
+
+{% block content %}
+        <div>
+            
+            
+            <form id="skriva" action="/skriva" method="post"></form>
+            
+            <div>
+                <input type="hidden" name="session_id" form="skriva" value="{{ session_id }}">
+                
+                <label for="fornavn">Fornavn:</label><br>
+                <input id="navn" type="text" name="fornavn" form="skriva"</input><br>
+                
+                <label for="efturnavn">Efturnavn:</label><br>
+                <input id="efturnavn" type="text" name="efturnavn"form="skriva" </input><br>
+                
+                <label for="stovnur">stovnur:</label><br>
+                <input id="stovnur" type="text" name="stovnur"form="skriva"</input><br>
+                
+                <label for="phone">Telefon nummar (Bert føroysk):</label><br>
+                <small>+298 </small><input type="tel" id="telefon" name="telefon" pattern="[0-9]{6}" form="skriva" ><br><br>
+                
+                
+                <label for="yvirskrift">Yvirskrift á lesarabrævinum</label><br>
+                <input id="yvirskrift" name="yvirskrift" form="skriva" ></input><br>
+                
+                
+                <div id="editor"></div>
+                <textarea name="text" style="display:none" id="hiddenArea"form="skriva"></textarea>
+                <script src="{{ url_for('static', filename='textEditor.js') }}"></script>
+                
+                
+                <label for="file">Um tú ynskir mynd á brævið:</label><br>
+                <form id="upload-form">
+                    <input type="hidden" name="session_id" value="{{ session_id }}">
+                    <input type="file" name="picture" >
+                    <button type="submit" >Upload</button><br>
+                    <script src="{{ url_for('static', filename='upload.js') }}"></script>
+                    <div id="message"></div>
+                </form>
+                <br>
+                
+
+            <button 
+                type="submit" 
+                form="skriva">
+                Send inn!
+            </button>
+            <br><br>
+        </div>
+    </div> 
+
+
+{% endblock %}
+
+

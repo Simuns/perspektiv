@@ -1,0 +1,77 @@
+*{
+    box-sizing: border-box
+}
+
+body {
+    height: 95h;
+    background: #EBF9FF;
+    font-family: Roboto;
+    text-align: left;
+    color: black;
+    font-size: 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    margin: 0;
+    background: #22BAFC;
+    padding: 0.2em 0 0.2em 0;
+}
+.main{
+    margin: 5px;
+    display: flex;
+    flex: 1;
+}   
+.left {
+    margin: 5px;
+    background: #EBF9FF;
+    padding: 3em 0 3em 0;
+    flex: 1.5 1 100px;
+}
+main{
+    margin: 5px;
+    background: #EBF9FF;
+    /*padding: 3em 0 3em 0;*/
+    flex: 5 5 150px;
+}
+.right {
+    margin: 5px;
+    background: #EBF9FF ;
+    padding: 3em 0 3em 0;
+    flex: 1.5 1 100px;
+}
+footer {
+    background: #E5E5E5;
+    padding: 1em 0 1em 0;
+}
+
+.floatingBox {
+    /*background-image: linear-gradient(#b5cad4, #EBF9FF);*/
+    
+    /*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
+    /*
+    background-color: #b5cad4;
+    border-right-style: solid;
+    */
+    border-radius: 5px; 
+    margin: 30px;
+    padding-bottom: 0px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    position: relative;
+}
+
+.floatingBox:hover {
+    background: #d3e4ec;
+}
+
+
+@media all and (max-width: 550px){
+    .main{
+        flex-direction: column;
+
+    }
+    main{
+        padding: 5em 0 5em 0;
+    }
+}

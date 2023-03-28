@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block head %}
+        <title>Forsíðan</title>
+{% endblock %}
+
+
+{% block header %}
+            <h1>Lesarabræv </h1>
+            <a href="/">Heim</a><br>
+{% endblock %}
+
+
+{% block content %}
+
+<h1>This page is for debugging </h1>
+<div>
+    <ul>
+        {% for key, value in art_dict.items() %}
+        <li><b>{{ key }}:</b> {{ value }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+
+{% if art_dict["picture_path"] %}
+<p>The uploaded picture</p>
+<img src="{{ url_for('static', filename='uploads/' + art_dict['picture_path']) }}" alt="{{  fornavn  }} {{ efturnavn }}">
+{% else %}
+<p>No picture was added</p>
+{% endif %}
+
+{% endblock %}

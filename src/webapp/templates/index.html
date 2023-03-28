@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block head %}
+        <title>Forsíðan</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+{% endblock %}
+
+
+
+
+
+
+
+{% block header %}
+            <h1>Les Lesarabrøv </h1>
+            <a href="/skriva">Skriva lesarabræv</a><br>
+{% endblock %}
+
+
+
+{% block content %}
+{% for key, value in art.items() %}
+                <div class="floatingBox">
+                    <div class="artPrev-right-top">
+                        {{ art[key]['time_delta'] }}
+                    </div>
+                    <div class="artPrev-title"><h2>{{ art[key]['yvirskrift'] }}</h2></div>
+                    <div class="artPrev-header">
+                        <div class="artPrev-content">
+                            <div class="artPrev-picture">
+                                {% if 'picture_path' in art[key] and art[key]['picture_path'] is not none %}
+                                <img src="{{ url_for('static', filename='uploads/' + art[key]['picture_path']) }}" alt="qwer" width="100">
+                                {% endif %}
+                            </div>
+                            <div class="artPrev-info">
+                                {% if art[key]['fornavn'] %}
+                                <p>{{ art[key]['fornavn'] }} {% if art[key]['efturnavn'] %}{{ art[key]['efturnavn'] }}{% endif %}</p>
+                                {% endif %}
+                                {% if art[key]['stovnur'] %}
+                                <p>{{ art[key]['stovnur'] }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <hr style="margin: 0px 1em; border: 1px solid grey; border-radius: 1em; background-color: gray;">
+                    <div class="artPrev-body">
+                        {{ art[key]['preview_text'] | safe }}
+                    </div>
+                </div>
+                
+{% endfor %}
+
+{% endblock %}

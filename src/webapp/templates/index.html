@@ -20,7 +20,8 @@
 
 {% block content %}
 {% for key, value in art.items() %}
-                <div class="floatingBox">
+
+                <div id="{{ art[key]['id'] }}" class="floatingBox">
                     <div class="artPrev-right-top">
                         {{ art[key]['time_delta'] }}
                     </div>
@@ -49,5 +50,5 @@
                 </div>
                 
 {% endfor %}
-
+<script src="{{ url_for('static', filename='click-floatingBox.js') }}"></script>
 {% endblock %}

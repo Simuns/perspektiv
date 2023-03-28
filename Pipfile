@@ -8,7 +8,7 @@ flask = "*"
 sqlalchemy = "*"
 flask-sqlalchemy = "*"
 uuid = "*"
-
+datetime = "*"
 [dev-packages]
 
 [requires]

@@ -14,3 +14,7 @@
     * `cd skrivarin`
 * install dependencies to git environment `pipenv install`
 * activate environment `pipenv shell`
+* Create database
+    * `cd src/webapp/`
+    * `flask initdb`
+* run webserver `flask run`

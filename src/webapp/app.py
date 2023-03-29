@@ -37,10 +37,12 @@ def index():
 
 @app.route('/brøv/<string:article_id>')
 def show_article(article_id):
-    article_db = artiklar.query.filter_by(id=article_id).first()
-    article_db = [article_db]
-    art_dict = latest_articles_dict(article_db)
-    return render_template('article.html',art_dict=art_dict[1])
+    art = artiklar.query.filter_by(id=article_id).first()
+    art_dict = rowToDict(art)
+    date_string = art_dict["created_stamp"].strftime('%Y-%m-%d')
+    art_dict["date_string"] = date_string
+
+    return render_template('article.html',art_dict=art_dict)
 
 @app.route('/skriva', methods=['POST', 'GET'])
 def skriva():
@@ -83,6 +85,7 @@ def skriva():
 
         art = artiklar.query.filter_by(id=session_id).first()
         art_dict = rowToDict(art)
+
         return render_template('framsyning.html',picture_path=art.picture_path,art_dict=art_dict)
     
     session_id = str(uuid.uuid4())[:8]

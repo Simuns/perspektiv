@@ -1,0 +1,27 @@
+.art-header{
+    display: flex;
+    height: 320px;
+    margin-bottom: 20px;
+    position: relative;
+}
+.art-date{
+    position: absolute;
+    top: 0;
+    font-size: 17px;
+}
+.art-picture {
+    width: auto;
+    text-align: right;   
+    margin-right: 20px;
+}
+
+.art-picture img{
+    max-height:300px;
+    max-width:300px;
+    height:auto;
+    width:auto;
+
+}
+.art-info{
+    flex: 1;
+}

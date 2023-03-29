@@ -2,7 +2,7 @@ FROM python:3.10-slim
 
 RUN pip install pipenv
 
-ENV SRC_DIR /usr/local/src/containers-first-steps
+ENV SRC_DIR /usr/local/src/container
 
 WORKDIR ${SRC_DIR}
 

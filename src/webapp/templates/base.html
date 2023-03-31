@@ -9,8 +9,18 @@
     </head>
     <body>
         <header>
-            {% block header %}
-            {% endblock %}
+            <nav>
+                <div class="main-header">
+                    <div class="logo">
+                        <div class="logo-text">
+                            skriva inn
+                        </div>
+                    </div>
+                    {% block header %}
+                    {% endblock %}
+                </div>
+            </nav>
+
         </header>
         <div class="main">
             <aside class="left">

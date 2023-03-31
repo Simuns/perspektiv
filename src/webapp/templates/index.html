@@ -3,7 +3,9 @@
 {% block head %}
         <title>Forsíðan</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
-{% endblock %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='article.css') }}">
+
+        {% endblock %}
 
 
 
@@ -12,15 +14,17 @@
 
 
 {% block header %}
-            <h1>Les Lesarabrøv </h1>
-            <a href="/skriva">Skriva lesarabræv</a><br>
+                    <div class="button-container">
+                        <form action="/skriva">
+                            <button class="button-17" role="button">skriva</button>
+                        </form>
+                    </div>
 {% endblock %}
 
 
 
 {% block content %}
 {% for key, value in art.items() %}
-
                 <div id="{{ art[key]['id'] }}" class="floatingBox">
                     <div class="artPrev-right-top">
                         {{ art[key]['time_delta'] }}

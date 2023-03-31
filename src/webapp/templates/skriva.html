@@ -10,10 +10,12 @@
 
 
 {% block header %}
-            <h1>skriva lesarabræv</h1>
-            <a href="/">Heim</a>
+                    <div class="button-container">
+                        <form action="/">
+                            <button class="button-17" role="button">les</button>
+                        </form>
+                    </div>
 {% endblock %}
-
 
 
 {% block content %}
@@ -42,10 +44,11 @@
                 <input id="yvirskrift" name="yvirskrift" form="skriva" ></input><br>
                 
                 
-                <div id="editor"></div>
-                <textarea name="text" style="display:none" id="hiddenArea"form="skriva"></textarea>
-                <script src="{{ url_for('static', filename='textEditor.js') }}"></script>
-                
+                <div class="editor-area">
+                    <div id="editor"></div>
+                    <textarea name="text" style="display:none" id="hiddenArea"form="skriva"></textarea>
+                    <script src="{{ url_for('static', filename='textEditor.js') }}"></script>
+                </div>
                 
                 <label for="file">Um tú ynskir mynd á brævið:</label><br>
                 <form id="upload-form">

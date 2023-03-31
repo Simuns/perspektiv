@@ -4,3 +4,8 @@ input {
     outline: none;
     font-size: 18;
 }
+#editor {
+    background: white;
+    min-height: 500px;
+    font-size: 20px;
+}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block head %}
+{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<p>dickus pickus</p>
+<form id="verify" action="/verify" method="post">
+    <input type="hidden" name="session_id" form="skriva" value="{{ session_id }}">
+    <label for="verification_code">Verification Code:</label><br>
+    <input id="verification_code" type="text" name="verification_code" </input><br>
+    <button 
+        type="submit">
+        Send inn!
+    </button>
+</form>
+
+{% endblock %}

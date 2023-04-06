@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import exc, text
 import uuid
 from datetime import datetime, timedelta
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///artiklar.db'
@@ -23,6 +25,10 @@ class artiklar(db.Model):
 
 @app.route('/')
 def index():
+    article_count = artiklar.query.count()
+    if article_count == 0:
+        session_id = str(uuid.uuid4())[:8]
+        return render_template('skriva.html', session_id=session_id)
     seinastu_artiklar_dbRaw = artiklar.query.order_by(artiklar.created_stamp.desc()).limit(10).all()
     seinastu_artiklar_dict = latest_articles_dict(seinastu_artiklar_dbRaw)
     for article in seinastu_artiklar_dict:
@@ -108,11 +114,23 @@ def upload():
     return jsonify({'success': True}), 200
 
 @app.cli.command('initdb')
+
+#def initdb_command():
+#    """Create the database tables."""
+#    with app.app_context():
+#        db.create_all()
+#    print('Initialized the database.')"""
+
 def initdb_command():
-    """Create the database tables."""
+    """Create the database tables if the database exists."""
     with app.app_context():
-        db.create_all()
-    print('Initialized the database.')    
+        try:
+            with db.engine.connect() as connection:
+                connection.execute(text('SELECT * FROM artiklar'))
+                print('Database already exists.')
+        except exc.OperationalError:
+            db.create_all()
+            print('Initialized the database.')
 
 if __name__ == "__main__":
     app.run(debug=True)

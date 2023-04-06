@@ -4,3 +4,4 @@
 !/src/webapp/static/uploads/.gitkeep
 /src/webapp/__pycache__
 /src/webapp/list
+config.yaml

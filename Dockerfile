@@ -14,4 +14,4 @@ COPY ./ ${SRC_DIR}/
 
 WORKDIR ${SRC_DIR}/src/webapp
 
-CMD ["flask", "run", "-h", "0.0.0.0"]
+CMD flask initdb && flask run -h 0.0.0.0

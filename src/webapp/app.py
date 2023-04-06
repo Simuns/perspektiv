@@ -107,23 +107,6 @@ def upload():
 
     return jsonify({'success': True}), 200
 
-@app.route('/test', methods=['POST', 'GET'])
-def test():
-    if request.method == 'POST':
-        data = request.get_json()
-        # use the data dictionary as needed
-        return 'Data received.'
-    else:
-        return render_template('test.html')
-
-@app.route('/testingbase')
-def testingbase():
-    return render_template('testingbase.html')
-def rowToDict(row):
-    newDict = row.__dict__
-    del newDict['_sa_instance_state']
-    return newDict
-
 @app.cli.command('initdb')
 def initdb_command():
     """Create the database tables."""
@@ -133,6 +116,11 @@ def initdb_command():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+def rowToDict(row):
+    newDict = row.__dict__
+    del newDict['_sa_instance_state']
+    return newDict
 
 
 def latest_articles_dict(databaseOutput):

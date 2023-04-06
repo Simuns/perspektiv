@@ -1,3 +1,7 @@
+.floatingBox.open {
+    padding:15px;
+
+}
 .art-header{
     display: flex;
     height: 320px;
@@ -12,7 +16,6 @@
 .art-picture {
     width: auto;
     text-align: right;   
-    margin-right: 20px;
 }
 
 .art-picture img{

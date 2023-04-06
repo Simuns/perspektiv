@@ -1,0 +1,6 @@
+/src/instance/*.db
+/src/webapp/__pycache__
+/src/webapp/static/uploads/*
+!/src/webapp/static/uploads/.gitkeep
+/src/webapp/__pycache__
+/src/webapp/list

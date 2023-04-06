@@ -1,0 +1,9 @@
+##### verify phone number smtp settings using sendgrid ####
+## set verifyPhone to true and populate other verify_ options if you wish sms verification on creation of articles
+verifyPhone: False 
+verify_senderMail: ''
+verify_apiKey: ''
+## seindging sms through mail prefixing with phone number ##
+# like this <phoneNumber>@<reciever>
+verify_receiver: 'gsm.fo'
+####

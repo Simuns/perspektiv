@@ -1,13 +1,38 @@
+#flask and database support
 from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc, text
+# Used for creating id's for articles
 import uuid
+#datetime for timestampings
 from datetime import datetime, timedelta
+# Verify phone number with email sending
+import sendgrid
+import os
+from sendgrid.helpers.mail import Mail, Email, To, Content
+import yaml
+# generate code
+import random
+
+
+#### load configurations ####
+# Get the absolute path of the grandparent directory (3 layers up)
+rootdir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
+# Load the file from the grandparent directory
+file_path = os.path.join(rootdir, "config.yaml")
+with open(file_path, "r") as file:
+    # Read the contents of the file
+    config = yaml.safe_load(file)
+
+
+
+
 
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///artiklar.db'
 db = SQLAlchemy(app)
+
 
 
 #db = SQLAlchemy(app)
@@ -21,7 +46,8 @@ class artiklar(db.Model):
     skriv = db.Column(db.Text)
     picture_path = db.Column(db.String(length=120), nullable=True)
     created_stamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
-
+    verified = db.Column(db.Boolean, default=False)
+    vercode = db.Column(db.String(6), nullable=True)
 
 @app.route('/')
 def index():
@@ -62,6 +88,11 @@ def skriva():
         quill_data = request.form.get('text')
         print("request form",request.form)
         
+
+        if config["verifyPhone"]:
+            #generate code
+            code = random.randint(100000, 999999)
+
         art = artiklar.query.filter_by(id=session_id).first()
         if art:
             print("USER FOUND WITH SESSION ID:",session_id,"updating user")
@@ -72,7 +103,8 @@ def skriva():
             art.yvirskrift=yvirskrift
             art.skriv=quill_data
             art.created_stamp = datetime.utcnow()
-
+            if config["verifyPhone"]:
+                art.vercode=code
             db.session.commit()
         else:
             print("NO USER FOUND WITH USER ID",session_id)
@@ -84,16 +116,19 @@ def skriva():
                 telefon=telefon,
                 yvirskrift=yvirskrift,
                 skriv=quill_data,
-                created_stamp = datetime.utcnow()
+                created_stamp = datetime.utcnow(),
+                vercode = code if config["verifyPhone"] else None
                 )
             db.session.add(nytt_skriv)
             db.session.commit()
 
         art = artiklar.query.filter_by(id=session_id).first()
         art_dict = rowToDict(art)
-
-        return render_template('framsyning.html',picture_path=art.picture_path,art_dict=art_dict)
-    
+        if config["verifyPhone"]:
+            verifyPhone(config, telefon, code)
+            return render_template('verify.html', session_id=session_id, telefon=telefon)
+        else:
+            index()
     session_id = str(uuid.uuid4())[:8]
     return render_template('skriva.html', session_id=session_id)
 
@@ -113,14 +148,17 @@ def upload():
 
     return jsonify({'success': True}), 200
 
+@app.route('/verify', methods=['POST'])
+def verify():
+    if request.method == 'POST':
+        session_id = request.form['session_id']
+        verified_code = request.form['verification_code']
+        print(session_id + verified_code)
+        art = artiklar.query.filter_by(id=session_id).first()
+        return("success")
+
+
 @app.cli.command('initdb')
-
-#def initdb_command():
-#    """Create the database tables."""
-#    with app.app_context():
-#        db.create_all()
-#    print('Initialized the database.')"""
-
 def initdb_command():
     """Create the database tables if the database exists."""
     with app.app_context():
@@ -132,8 +170,7 @@ def initdb_command():
             db.create_all()
             print('Initialized the database.')
 
-if __name__ == "__main__":
-    app.run(debug=True)
+
 
 def rowToDict(row):
     newDict = row.__dict__
@@ -192,3 +229,24 @@ def preview_article(text, preview_lenght=40):
     else:
         shortened_text = " ".join(words[:preview_lenght])
         return "<p>"+shortened_text+"..."+"</p>"
+
+
+def verifyPhone(config, phoneNumber, code):
+    if config['verifyPhone']:
+        sg = sendgrid.SendGridAPIClient(api_key=config['verify_apiKey'])
+        from_email = Email(config['verify_senderMail'])  # Change to your verified sender
+        to_email = To(phoneNumber+'@'+config['verify_receiver'])  # Change to your recipient
+        subject = "Perspektiv Koda"
+        content = Content("text/plain", f"Verification code is: {code}")
+        mail = Mail(from_email, to_email, subject, content)
+
+        # Get a JSON-ready representation of the Mail object
+        mail_json = mail.get()
+
+        # Send an HTTP POST request to /mail/send
+        response = sg.client.mail.send.post(request_body=mail_json)
+        print(response.status_code)
+        print(response.headers)
+
+if __name__ == "__main__":
+    app.run(debug=True)

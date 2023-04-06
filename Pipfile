@@ -9,6 +9,9 @@ sqlalchemy = "*"
 flask-sqlalchemy = "*"
 uuid = "*"
 datetime = "*"
+sendgrid = "*"
+pyyaml = "*"
+
 [dev-packages]
 
 [requires]

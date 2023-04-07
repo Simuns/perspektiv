@@ -89,11 +89,9 @@ def skriva():
         quill_data = request.form.get('text')
         print("request form",request.form)
         
-
         if config["verifyPhone"]:
             #generate code
             code = random.randint(100000, 999999)
-
         art = artiklar.query.filter_by(id=session_id).first()
         if art:
             print("USER FOUND WITH SESSION ID:",session_id,"updating user")
@@ -149,14 +147,32 @@ def upload():
 
     return jsonify({'success': True}), 200
 
-@app.route('/verify', methods=['POST'])
-def verify():
+@app.route('/verify_status',methods=['POST', 'GET'])
+def verify_status():
     if request.method == 'POST':
         session_id = request.form['session_id']
         verified_code = request.form['verification_code']
-        print(session_id + verified_code)
+        telefon = request.form['telefon']
+        print("verification code",verified_code)
         art = artiklar.query.filter_by(id=session_id).first()
-        return("success")
+        print("user input",art.vercode)
+        if verified_code == art.vercode:
+            return render_template('verify_success.html')
+        else:
+            return render_template('verify.html', session_id=session_id, telefon=telefon, status="Kodan var skeiv, prøva umaftur!")
+
+@app.route('/send_sms', methods=['POST'])
+def send_sms():
+    if request.method == 'POST':
+        if config["verifyPhone"]:
+            data = request.get_json()
+            session_id = data.get('session_id')
+            telefon = data.get('telefon')
+            art = artiklar.query.filter_by(id=session_id).first()
+            verifyPhone(config, telefon, art.vercode)
+            return jsonify({'success': True}), 200
+        else:
+            return jsonify({'Phone number sms verification not activated': True}), 500
 
 
 @app.cli.command('initdb')
@@ -170,7 +186,6 @@ def initdb_command():
         except exc.OperationalError:
             db.create_all()
             print('Initialized the database.')
-
 
 
 def rowToDict(row):

@@ -1,21 +1,39 @@
 {% extends 'base.html' %}
 
 {% block head %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='verify.css') }}">
+        <title>Vátta telefon</title>
 {% endblock %}
 
 {% block header %}
 {% endblock %}
 
 {% block content %}
-<p>dickus pickus</p>
-<form id="verify" action="/verify" method="post">
-    <input type="hidden" name="session_id" form="skriva" value="{{ session_id }}">
-    <label for="verification_code">Verification Code:</label><br>
-    <input id="verification_code" type="text" name="verification_code" </input><br>
+{% if status %}
+    <div class="skeiv-koda">
+        <p>{{ status }}</p>
+    </div>
+{% endif %}
+
+<form id="verify" action="/verify_status" method="post">
+    <input type="hidden" name="session_id" value="{{ session_id }}">
+    <input type="hidden" name="telefon" value="{{ telefon }}">
+    <label for="verification_code">Skriva SMS'in her:</label>
+    <input id="verification_code" type="text" name="verification_code"><br>
     <button 
         type="submit">
         Send inn!
     </button>
 </form>
+<form name="resend-SMS" method="POST">
+    <input type="hidden" name="session_id" value="{{ session_id }}">
+    <input type="hidden" name="telefon" value="{{ telefon }}">
+    <button 
+        type="submit">
+        Send nýggjan sms til {{ telefon }}
+    </button>
+</form>
+<script src="{{ url_for('static', filename='resendSMS.js') }}"></script>
+
 
 {% endblock %}

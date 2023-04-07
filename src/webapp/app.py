@@ -157,6 +157,14 @@ def verify_status():
         art = artiklar.query.filter_by(id=session_id).first()
         print("user input",art.vercode)
         if verified_code == art.vercode:
+            verified = db.Column(db.Boolean, default=False)
+
+            art = artiklar.query.filter_by(id=session_id).first()
+            if art:
+                print("USER FOUND WITH SESSION ID:",session_id,"updating verified status")
+                art.verified=True
+                db.session.commit()
+
             return render_template('verify_success.html')
         else:
             return render_template('verify.html', session_id=session_id, telefon=telefon, status="Kodan var skeiv, prøva umaftur!")

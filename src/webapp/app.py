@@ -104,6 +104,8 @@ def skriva():
             art.created_stamp = datetime.utcnow()
             if config["verifyPhone"]:
                 art.vercode=code
+            else:
+                art.verified=True
             db.session.commit()
         else:
             print("NO USER FOUND WITH USER ID",session_id)
@@ -116,13 +118,13 @@ def skriva():
                 yvirskrift=yvirskrift,
                 skriv=quill_data,
                 created_stamp = datetime.utcnow(),
-                vercode = code if config["verifyPhone"] else None
+                vercode = code if config["verifyPhone"] else None,
+                verified = True if config["verifyPhone"] else False
                 )
+
             db.session.add(nytt_skriv)
             db.session.commit()
 
-        art = artiklar.query.filter_by(id=session_id).first()
-        art_dict = rowToDict(art)
         if config["verifyPhone"]:
             verifyPhone(config, telefon, code)
             return render_template('verify.html', session_id=session_id, telefon=telefon)
@@ -152,14 +154,9 @@ def verify_status():
     if request.method == 'POST':
         session_id = request.form['session_id']
         verified_code = request.form['verification_code']
-        telefon = request.form['telefon']
-        print("verification code",verified_code)
         art = artiklar.query.filter_by(id=session_id).first()
-        print("user input",art.vercode)
         if verified_code == art.vercode:
             verified = db.Column(db.Boolean, default=False)
-
-            art = artiklar.query.filter_by(id=session_id).first()
             if art:
                 print("USER FOUND WITH SESSION ID:",session_id,"updating verified status")
                 art.verified=True
@@ -167,7 +164,7 @@ def verify_status():
 
             return render_template('verify_success.html')
         else:
-            return render_template('verify.html', session_id=session_id, telefon=telefon, status="Kodan var skeiv, prøva umaftur!")
+            return render_template('verify.html', session_id=session_id, telefon=art.telefon, status="Kodan var skeiv, prøva umaftur!")
 
 @app.route('/send_sms', methods=['POST'])
 def send_sms():
@@ -175,9 +172,8 @@ def send_sms():
         if config["verifyPhone"]:
             data = request.get_json()
             session_id = data.get('session_id')
-            telefon = data.get('telefon')
             art = artiklar.query.filter_by(id=session_id).first()
-            verifyPhone(config, telefon, art.vercode)
+            verifyPhone(config, art.telefon, art.vercode)
             return jsonify({'success': True}), 200
         else:
             return jsonify({'Phone number sms verification not activated': True}), 500

@@ -4,7 +4,7 @@
 
 body {
     height: 95h;
-    background: #EBF9FF;
+    background: #fbfdfe;
     font-family: Roboto;
     text-align: left;
     color: black;
@@ -39,24 +39,24 @@ nav a {
 }   
 .left {
     margin: 5px;
-    background: #EBF9FF;
+    background: #fbfdfe;
     padding: 3em 0 3em 0;
     flex: 1.5 1 100px;
 }
 main{
     margin: 5px;
-    background: #EBF9FF;
+    background: #fbfdfe;
     /*padding: 3em 0 3em 0;*/
     flex: 5 5 150px;
 }
 .right {
     margin: 5px;
-    background: #EBF9FF ;
+    background: #fbfdfe ;
     padding: 3em 0 3em 0;
     flex: 1.5 1 100px;
 }
 footer {
-    background: #E5E5E5;
+    background: #fbfdfe;
     padding: 1em 0 1em 0;
 }
 
@@ -69,7 +69,7 @@ footer {
 }
 
 .floatingBox:hover {
-    background: #d3e4ec;
+    background: #F7FBFD;
 }
 
 
@@ -89,7 +89,7 @@ footer {
 
 
 .main-header{
-    width: 50%;
+    width: 53.5%;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;

@@ -11,10 +11,10 @@
         <header>
             <nav>
                 <div class="main-header">
-                    <div class="logo">
-                        <div class="logo-text">
-                            skriva inn
-                        </div>
+                    <div class="logo-large">
+                        <a href="/">
+                            <img src="{{ url_for('static', filename='logo-large.png') }}" alt="Skriva Inn logo">
+                        </a>
                     </div>
                     {% block header %}
                     {% endblock %}

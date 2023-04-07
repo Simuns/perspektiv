@@ -1,5 +1,5 @@
 #flask and database support
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc, text
 # Used for creating id's for articles
@@ -128,7 +128,7 @@ def skriva():
             verifyPhone(config, telefon, code)
             return render_template('verify.html', session_id=session_id, telefon=telefon)
         else:
-            index()
+            return redirect(url_for('index'))
     session_id = str(uuid.uuid4())[:8]
     return render_template('skriva.html', session_id=session_id)
 

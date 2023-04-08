@@ -1,5 +1,5 @@
 #flask and database support
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, send_from_directory
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc, text
@@ -56,7 +56,8 @@ def index():
     if article_count == 0:
         session_id = str(uuid.uuid4())[:8]
         return render_template('skriva.html', session_id=session_id)
-    seinastu_artiklar_dbRaw = artiklar.query.order_by(artiklar.created_stamp.desc()).limit(10).all()
+    #seinastu_artiklar_dbRaw = artiklar.query.order_by(artiklar.created_stamp.desc()).limit(10).all()
+    seinastu_artiklar_dbRaw = artiklar.query.filter_by(verified=True).order_by(artiklar.created_stamp.desc()).limit(10).all()
     seinastu_artiklar_dict = latest_articles_dict(seinastu_artiklar_dbRaw)
     for article in seinastu_artiklar_dict:
         time_delta = timeDelta(seinastu_artiklar_dict[article]["created_stamp"])
@@ -71,11 +72,15 @@ def index():
 @app.route('/brøv/<string:article_id>')
 def show_article(article_id):
     art = artiklar.query.filter_by(id=article_id).first()
-    art_dict = rowToDict(art)
-    date_string = art_dict["created_stamp"].strftime('%Y-%m-%d')
-    art_dict["date_string"] = date_string
-
-    return render_template('article.html',art_dict=art_dict)
+    if art is None:
+        return render_template('error.html',error="Brævið finst ikki")
+    if art.verified:
+        art_dict = rowToDict(art)
+        date_string = art_dict["created_stamp"].strftime('%Y-%m-%d')
+        art_dict["date_string"] = date_string
+        return render_template('article.html',art_dict=art_dict)
+    else:
+        return render_template('error.html',error="Brævið er ikki váttað enn")
 
 @app.route('/skriva', methods=['POST', 'GET'])
 def skriva():
@@ -119,7 +124,7 @@ def skriva():
                 skriv=quill_data,
                 created_stamp = datetime.utcnow(),
                 vercode = code if config["verifyPhone"] else None,
-                verified = True if config["verifyPhone"] else False
+                verified = False if config["verifyPhone"] else True
                 )
 
             db.session.add(nytt_skriv)
@@ -156,7 +161,6 @@ def verify_status():
         verified_code = request.form['verification_code']
         art = artiklar.query.filter_by(id=session_id).first()
         if verified_code == art.vercode:
-            verified = db.Column(db.Boolean, default=False)
             if art:
                 print("USER FOUND WITH SESSION ID:",session_id,"updating verified status")
                 art.verified=True
@@ -177,6 +181,11 @@ def send_sms():
             return jsonify({'success': True}), 200
         else:
             return jsonify({'Phone number sms verification not activated': True}), 500
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 @app.cli.command('initdb')

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block head %}
-        <title>Forsíðan</title>
+        <title>Perspektiv | Veggur</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='article.css') }}">
 
@@ -34,7 +34,7 @@
                         <div class="artPrev-content">
                             <div class="artPrev-picture">
                                 {% if 'picture_path' in art[key] and art[key]['picture_path'] is not none %}
-                                <img src="{{ url_for('static', filename='uploads/' + art[key]['picture_path']) }}" alt="qwer" width="100">
+                                <img src="{{ url_for('static', filename='uploads/' + 'small-' + art[key]['picture_path']) }}" alt="qwer" width="100">
                                 {% endif %}
                             </div>
                             <div class="artPrev-info">

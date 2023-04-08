@@ -32,7 +32,7 @@
             
         <div class="art-picture">
             {% if art_dict["picture_path"] %}
-            <img src="{{ url_for('static', filename='uploads/' + art_dict['picture_path']) }}" alt="{{  fornavn  }} {{ efturnavn }}">
+            <img src="{{ url_for('static', filename='uploads/' + 'large-' + art_dict['picture_path']) }}" alt="{{  fornavn  }} {{ efturnavn }}">
             {% else %}
             {% endif %}
         </div>

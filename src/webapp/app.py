@@ -18,6 +18,7 @@ import random
 from PIL import Image
 
 
+
 #### load configurations ####
 # Get the absolute path of the grandparent directory (3 layers up)
 rootdir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
@@ -28,17 +29,12 @@ with open(file_path, "r") as file:
     config = yaml.safe_load(file)
 
 
-
-
-
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///artiklar.db'
 db = SQLAlchemy(app)
 
 
 
-#db = SQLAlchemy(app)
 class artiklar(db.Model):
     id = db.Column(db.String(8), primary_key=True)
     fornavn = db.Column(db.String(50), nullable=True)
@@ -145,35 +141,46 @@ def upload():
     if 'picture' not in request.files:
         return jsonify({'error': 'No picture provided'}), 400
 
+    ## fetch data from /upload path ##
     picture = request.files['picture']
     session_id = request.form['session_id']
+
+
+    ## set static names 
     picture_filename = session_id + "-" + picture.filename
-    large_picture_filename =  "large-" + picture_filename
-    picture.save('static/uploads/'+ large_picture_filename)
+    picture_filename_jpg = os.path.splitext(picture_filename)[0] + '.jpg'
+    small_picture_filename='small-' + os.path.splitext(picture_filename)[0] + '.jpg'
+    large_picture_filename='large-' + os.path.splitext(picture_filename)[0] + '.jpg'
+
+    picture.save('static/uploads/'+ picture_filename)
 
 
     ## Process image ##
-    open_raw_picture_filename = Image.open('static/uploads/' + large_picture_filename)
+    open_raw_picture_filename = Image.open('static/uploads/' + picture_filename)
+
+    if open_raw_picture_filename.mode == 'RGBA':
+        open_raw_picture_filename = open_raw_picture_filename.convert('RGB')
+
+
+    # Saving large picture
+    open_raw_picture_filename.save('static/uploads/' + large_picture_filename, optimize=True, quality=95)
     width, height = open_raw_picture_filename.size
     TARGET_WIDTH = 100
     coefficient = width / 100
     new_height = height / coefficient
     small_picture = open_raw_picture_filename.resize((int(TARGET_WIDTH),int(new_height)),Image.ANTIALIAS)
-    small_picture_filename='small-' + os.path.splitext(picture_filename)[0] + '.jpg'
+    # saving small picture #
     small_picture.save(f"static/uploads/{small_picture_filename}")
 
+
+    ## add picture path to database ##
     nyggj_mynd = artiklar(
         id=session_id,
-        picture_path=picture_filename)
+        picture_path=picture_filename_jpg)
     db.session.add(nyggj_mynd)
     db.session.commit()
 
     return jsonify({'success': True}), 200
-
-
-
-
-
 
 
 @app.route('/verify_status',methods=['POST', 'GET'])

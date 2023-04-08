@@ -11,6 +11,7 @@ uuid = "*"
 datetime = "*"
 sendgrid = "*"
 pyyaml = "*"
+pillow = "*"
 
 [dev-packages]
 

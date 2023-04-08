@@ -46,7 +46,6 @@ nav a {
 main{
     margin: 5px;
     background: #fbfdfe;
-    /*padding: 3em 0 3em 0;*/
     flex: 5 5 150px;
 }
 .right {
@@ -190,4 +189,8 @@ footer {
 .logo-large img {
     width:260px;
     height:auto;
+}
+
+.favicon img{
+    border-radius: 50%;
 }

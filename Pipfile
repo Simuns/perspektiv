@@ -12,6 +12,7 @@ datetime = "*"
 sendgrid = "*"
 pyyaml = "*"
 pillow = "*"
+opencv-python = "*"
 
 [dev-packages]
 

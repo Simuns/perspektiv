@@ -14,6 +14,8 @@ from sendgrid.helpers.mail import Mail, Email, To, Content
 import yaml
 # generate code
 import random
+# Used for picture reduction in size
+from PIL import Image
 
 
 #### load configurations ####
@@ -145,14 +147,34 @@ def upload():
 
     picture = request.files['picture']
     session_id = request.form['session_id']
-    picture.save('static/uploads/'+ session_id + "-" + picture.filename)
+    picture_filename = session_id + "-" + picture.filename
+    large_picture_filename =  "large-" + picture_filename
+    picture.save('static/uploads/'+ large_picture_filename)
+
+
+    ## Process image ##
+    open_raw_picture_filename = Image.open('static/uploads/' + large_picture_filename)
+    width, height = open_raw_picture_filename.size
+    TARGET_WIDTH = 100
+    coefficient = width / 100
+    new_height = height / coefficient
+    small_picture = open_raw_picture_filename.resize((int(TARGET_WIDTH),int(new_height)),Image.ANTIALIAS)
+    small_picture_filename='small-' + os.path.splitext(picture_filename)[0] + '.jpg'
+    small_picture.save(f"static/uploads/{small_picture_filename}")
+
     nyggj_mynd = artiklar(
         id=session_id,
-        picture_path=session_id + "-" + picture.filename)
+        picture_path=picture_filename)
     db.session.add(nyggj_mynd)
     db.session.commit()
 
     return jsonify({'success': True}), 200
+
+
+
+
+
+
 
 @app.route('/verify_status',methods=['POST', 'GET'])
 def verify_status():

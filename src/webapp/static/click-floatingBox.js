@@ -1,6 +1,4 @@
-const floatingBoxes = document.querySelectorAll('.floatingBox');
-
-floatingBoxes.forEach(box => {
+function bindFloatingBoxClick(box) {
   // Define the function to restore the original content
   function restoreOriginalContent() {
     box.innerHTML = box.getAttribute('data-content');
@@ -41,4 +39,25 @@ floatingBoxes.forEach(box => {
   });
 
   box.style.cursor = 'pointer';
+}
+
+const observer = new MutationObserver(mutations => {
+  mutations.forEach(mutation => {
+    const newBoxes = Array.from(mutation.addedNodes).filter(node => node.classList && node.classList.contains('floatingBox'));
+    newBoxes.forEach(box => {
+      bindFloatingBoxClick(box);
+    });
+  });
+});
+
+const observerOptions = {
+  childList: true,
+  subtree: true
+};
+
+observer.observe(document.body, observerOptions);
+
+const floatingBoxes = document.querySelectorAll('.floatingBox');
+floatingBoxes.forEach(box => {
+  bindFloatingBoxClick(box);
 });

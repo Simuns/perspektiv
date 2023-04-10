@@ -54,7 +54,6 @@ def index():
     if article_count == 0:
         session_id = str(uuid.uuid4())[:8]
         return render_template('skriva.html', session_id=session_id)
-    #seinastu_artiklar_dbRaw = artiklar.query.order_by(artiklar.created_stamp.desc()).limit(10).all()
     seinastu_artiklar_dbRaw = artiklar.query.filter_by(verified=True).order_by(artiklar.created_stamp.desc()).limit(10).all()
     seinastu_artiklar_dict = latest_articles_dict(seinastu_artiklar_dbRaw)
     for article in seinastu_artiklar_dict:
@@ -66,6 +65,46 @@ def index():
         seinastu_artiklar_dict[article]["preview_text"] = preview_text
 
     return render_template('index.html',art=seinastu_artiklar_dict)
+
+@app.route('/index_loadMore', methods=['POST', 'GET'])
+def index_loadMore():
+    ## fetch last article when scrolled to bottom of index page ##
+    last_floating_box_id = request.form.get('lastFloatingBoxId')
+    print("last floating box id",last_floating_box_id)
+
+    ## find older articles than the last one on the page
+
+    entry = artiklar.query.filter_by(id=last_floating_box_id).first()
+    ## If the entry was found, retrieve the two articles written prior to it ##
+    if entry:
+        two_articles_prior = artiklar.query.filter(
+            artiklar.created_stamp < entry.created_stamp,
+            artiklar.verified == True
+        ).order_by(artiklar.created_stamp.desc()).limit(2).all()
+        seinastu_artiklar_dict = latest_articles_dict(two_articles_prior)
+
+
+        for article in seinastu_artiklar_dict:
+            time_delta = timeDelta(seinastu_artiklar_dict[article]["created_stamp"])
+            seinastu_artiklar_dict[article]["time_delta"] = time_delta
+
+            
+            preview_text = preview_article(seinastu_artiklar_dict[article]["skriv"])
+            seinastu_artiklar_dict[article]["preview_text"] = preview_text
+
+        
+        return render_template('base-prev.html', art=seinastu_artiklar_dict)
+
+
+
+
+
+
+
+
+
+
+
 
 @app.route('/brøv/<string:article_id>')
 def show_article(article_id):
@@ -229,6 +268,20 @@ def initdb_command():
             db.create_all()
             print('Initialized the database.')
 
+@app.cli.command('dbq')
+def dbq_command():
+    entry = artiklar.query.filter_by(id='455313cd').first()
+# If the entry was found, retrieve the two articles written prior to it
+    if entry:
+        two_articles_prior = artiklar.query.filter(
+            artiklar.created_stamp < entry.created_stamp,
+            artiklar.verified == True
+        ).order_by(artiklar.created_stamp.desc()).limit(2).all()
+        seinastu_artiklar_dict = latest_articles_dict(two_articles_prior)
+        for dict in seinastu_artiklar_dict:
+            print(seinastu_artiklar_dict[dict]['yvirskrift'])
+
+
 
 def rowToDict(row):
     newDict = row.__dict__
@@ -238,7 +291,6 @@ def rowToDict(row):
 
 def latest_articles_dict(databaseOutput):
     # Create a list of dictionaries and number each one
-    print("heybreyð",databaseOutput)
     dict_list = []
     for i in databaseOutput:
         artikkul_dict = rowToDict(i)

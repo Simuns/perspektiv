@@ -16,6 +16,9 @@ My goal was to write something beautiful with as little code as possible. Althou
 - [x] Letter verification via SMS
 - [X] scroll and load more content on frontpage
 - [ ] picture compression to save some space
+- [ ] Include login page
+- [ ] edit/delete articles feature
+- [ ] search function on front page
 
 # installation guides
 ## Install via docker

@@ -12,9 +12,9 @@ My goal was to write something beautiful with as little code as possible. Althou
 
 
 ### My plan is to include these extra features as time goes:
-- [ ] styled page for each letter
-- [ ] Letter verification via SMS and captcha
-- [ ] scroll and load more content on frontpage
+- [x] styled page for each letter
+- [x] Letter verification via SMS
+- [X] scroll and load more content on frontpage
 - [ ] picture compression to save some space
 
 # installation guides

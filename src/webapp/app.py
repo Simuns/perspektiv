@@ -1,6 +1,8 @@
 #flask and database support
 from flask import Flask, render_template, request, jsonify, redirect, url_for, send_from_directory
 
+
+
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc, text
 # Used for creating id's for articles
@@ -190,19 +192,28 @@ def upload():
     picture_filename_jpg = os.path.splitext(picture_filename)[0] + '.jpg'
     small_picture_filename='small-' + os.path.splitext(picture_filename)[0] + '.jpg'
     large_picture_filename='large-' + os.path.splitext(picture_filename)[0] + '.jpg'
+    original_picture_filename =       os.path.splitext(picture_filename)[0] + '.jpg'
 
-    picture.save('static/uploads/'+ picture_filename)
+    picture.save(f'static/uploads/orig-{picture_filename}')
 
 
     ## Process image ##
-    open_raw_picture_filename = Image.open('static/uploads/' + picture_filename)
+    open_raw_picture_filename = Image.open(f'static/uploads/orig-{picture_filename}')
 
     if open_raw_picture_filename.mode == 'RGBA':
         open_raw_picture_filename = open_raw_picture_filename.convert('RGB')
 
 
-    # Saving large picture
-    open_raw_picture_filename.save('static/uploads/' + large_picture_filename, optimize=True, quality=95)
+    # Handeling large picture
+    width, height = open_raw_picture_filename.size
+    TARGET_WIDTH = 1000
+    coefficient = width / 1000
+    new_height = height / coefficient
+    large_picture = open_raw_picture_filename.resize((int(TARGET_WIDTH),int(new_height)),Image.ANTIALIAS)
+    large_picture.save(f"static/uploads/{large_picture_filename}")
+
+
+    # Handeling small picture
     width, height = open_raw_picture_filename.size
     TARGET_WIDTH = 100
     coefficient = width / 100

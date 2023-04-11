@@ -15,7 +15,7 @@ My goal was to write something beautiful with as little code as possible. Althou
 - [x] styled page for each letter
 - [x] Letter verification via SMS
 - [X] scroll and load more content on frontpage
-- [ ] picture compression to save some space
+- [x] picture compression to save some space
 - [ ] Include login page
 - [ ] edit/delete articles feature
 - [ ] search function on front page

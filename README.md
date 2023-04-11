@@ -1,6 +1,6 @@
 ![frontpage](.gitcontent/frontpage.png)
 
-# description
+# 
 This project was a way for me to learn how webdevelopment works. It allowed me to experiment with:
 * flask and jinja2 templating
 * fun stuff with databases :D
@@ -18,6 +18,7 @@ My goal was to write something beautiful with as little code as possible. Althou
 - [x] Letter verification via SMS
 - [X] scroll and load more content on frontpage
 - [x] picture compression to save some space
+- [x] Very fancy fitting logo (thank you Matteus)
 - [ ] Include login page
 - [ ] edit/delete articles feature
 - [ ] search function on front page

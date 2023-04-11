@@ -1,3 +1,5 @@
+![frontpage](.gitcontent/frontpage.png)
+
 # description
 This project was a way for me to learn how webdevelopment works. It allowed me to experiment with:
 * flask and jinja2 templating

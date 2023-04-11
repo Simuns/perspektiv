@@ -26,14 +26,14 @@ My goal was to write something beautiful with as little code as possible. Althou
 # installation guides
 ## Install via docker
 
-* build container `docker build -t skrivarin:latest github.com/simuns/skrivarin`
-* activating container `docker run --rm -p 5000:5000 skrivarin`
+* build container `docker build -t perspektiv:latest github.com/simuns/perspektiv`
+* activating container `docker run --rm -p 5000:5000 perspektiv`
 
 ## Install via pipenv
 
 * clone and enter the project 
-    * `git clone https://github.com/simuns/skrivarin.git`
-    * `cd skrivarin`
+    * `git clone https://github.com/simuns/perspektiv.git`
+    * `cd perspektiv`
 * install dependencies to git environment `pipenv install`
 * activate environment `pipenv shell`
 * Create database

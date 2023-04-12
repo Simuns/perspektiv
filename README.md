@@ -22,6 +22,9 @@ My goal was to write something beautiful with as little code as possible. Althou
 - [ ] Include login page
 - [ ] edit/delete articles feature
 - [ ] search function on front page
+- [ ] agree/disagree on articles
+- [ ] reply to artilce
+- [ ] comment on article
 
 # installation guides
 ## Install via docker

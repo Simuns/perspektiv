@@ -1,6 +1,5 @@
 #flask and database support
 from flask import Flask, render_template, request, jsonify, redirect, url_for, send_from_directory
-
 #loading settings defined in the settings.yaml file
 from webapp.settings import app_config
 from flask_sqlalchemy import SQLAlchemy
@@ -13,18 +12,14 @@ from datetime import datetime, timedelta
 import sendgrid
 import os
 from sendgrid.helpers.mail import Mail, Email, To, Content
-
 # generate verification code
 import random
 # Used for picture reduction in size
 from PIL import Image
-
 from webapp.database import db, artiklar, UserModel, login
 from flask_login import login_required, current_user, login_user, logout_user
-
 # Load settings defined in config.yaml
 app_config = app_config()
-
 #regex
 import re
 
@@ -293,12 +288,15 @@ def send_sms():
         else:
             return jsonify({'Phone number sms verification not activated': True}), 500
 
+
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
                                 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
+## BY RUNNING COMMAND 'flask initdb' within app folder,  ##
+## this creates an sql database instance                 ##
 @app.cli.command('initdb')
 def initdb_command():
     """Create the database tables if the database exists."""
@@ -312,12 +310,16 @@ def initdb_command():
             print('Initialized the database.')
 
 
+## USED TO HANDLE DATABASE TABLE INPUT ##
+## AND CLEAN DATA OUTPUT IN DICTIONARY ##      
 def rowToDict(row):
     newDict = row.__dict__
     del newDict['_sa_instance_state']
     return newDict
 
 
+## USED TO GET NESTED ARTICLE DICTIONARY FROM DATABASE OUTPUT ##
+## CAN BE PARSED DIRECTLY INTO HTML AND USED WITH JINJA       ##
 def latest_articles_dict(databaseOutput):
     # Create a list of dictionaries and number each one
     dict_list = []
@@ -333,7 +335,7 @@ def latest_articles_dict(databaseOutput):
         nested_dict.update(d)
     return nested_dict
 
-
+## USED TO ADD REALTIME TIMEDELTA TO HTML BASED ON TIMESTAMPING##
 def timeDelta(timestamp):
     now = datetime.utcnow()
     delta = now - timestamp
@@ -350,10 +352,9 @@ def timeDelta(timestamp):
             days_ago = delta.days
             return f"{days_ago} dagar síðani"
 
-def preview_article(text, preview_lenght=40):
-    
 
     ###THIS SECTION REMOVES ALL HTML SYNTAX FROM TEXT###
+def preview_article(text, preview_lenght=40):
     # Define the regular expression pattern to search for
     pattern = r"<[^>]+>"
     # Define the replacement string
@@ -370,6 +371,8 @@ def preview_article(text, preview_lenght=40):
         return "<p>"+shortened_text+"..."+"</p>"
 
 
+## USED TO SEND SMS's TO THE END USER ##
+# THIS IS ACHIEVED BY FIRST SENDING MAIL TO MAIL->SMS RELAY #
 def verifyPhone(app_config, phoneNumber, code):
     if app_config['verifyPhone']:
         sg = sendgrid.SendGridAPIClient(api_key=app_config['verify_apiKey'])
@@ -387,5 +390,7 @@ def verifyPhone(app_config, phoneNumber, code):
         print(response.status_code)
         print(response.headers)
 
+
+## KEEP APP RUNNING ##
 if __name__ == "__main__":
     app.run(debug=True)

@@ -19,7 +19,7 @@ My goal was to write something beautiful with as little code as possible. Althou
 - [X] scroll and load more content on frontpage
 - [x] picture compression to save some space
 - [x] Very fancy fitting logo (thank you Matteus)
-- [ ] Include login page
+- [x] Include login/user session logic
 - [ ] edit/delete articles feature
 - [ ] search function on front page
 - [ ] agree/disagree on articles

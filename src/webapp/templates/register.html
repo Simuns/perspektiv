@@ -1,9 +1,20 @@
+{% extends 'base.html' %}
+
+{% block head %}
+        <title>Upprætta</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="main-register">
 <form action="" method = "POST">
-    <p>email <input type = "email" name = "email" /></p>
-    <p>Username <input type = "text" name = "username" /></p>
-    <p>password <input type = "password" name = "password" /></p>
-    <p> submit <input type = "submit" value = "Submit" /></p>
+    <p>Post Addressa <input type = "email" name = "email" /></p>
+    <p>Telefon nummar <input type = "text" name = "telefon" /></p>
+    <p>Loyniorð<input type = "password" name = "password" /></p>
+    <p>Upprætta<input type = "submit" value = "Submit" /></p>
 </form>
- 
-<h3>Already Have an Account?</h3><br>
-<h3><a href ="{{url_for('login')}}">Login Here</a></h3>
+
+<h3>Hevur tú longu konto?</h3><br>
+<h3><a href ="{{url_for('login')}}">Rita inn</a></h3>
+</div>
+{% endblock %}

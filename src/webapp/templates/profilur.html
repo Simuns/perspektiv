@@ -1,3 +1,15 @@
-<h1>ACCESS GRANTED HERE IS THE BLOG</h1>
+{% extends 'base.html' %}
 
-<p>Hey {{  email  }},,, títt telefonnummar er  {{ telefon }}, og id er  {{id}}</p>
+{% block head %}
+        <title>Profilur</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='ritainn.css') }}">
+{% endblock %}
+
+{% block content %}
+    <p>Hey {{  email  }},,, títt telefonnummar er  {{ telefon }}, og id er  {{id}}</p>
+    <p>initials er {{initials}}</p>
+
+{% endblock %}
+
+
+

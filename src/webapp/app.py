@@ -233,6 +233,8 @@ def register():
 
     if request.method == 'POST':
         email = request.form['email']
+        fornavn = request.form['fornavn']
+        efturnavn = request.form['efturnavn']
         telefon = request.form['telefon']
         password = request.form['password']
 
@@ -242,7 +244,9 @@ def register():
             return ('telefon finst longu')
 
         user = UserModel(
-            email=email, 
+            email=email,
+            fornavn=fornavn,
+            efturnavn=efturnavn,
             telefon=telefon)
 
         user.set_password(password)
@@ -377,7 +381,11 @@ def preview_article(text, preview_lenght=40):
 ## LOGIN BUTTON SHOULD EXSIST OR NOT                 ##
 @app.context_processor
 def inject_auth():
-    return dict(authenticated=current_user.is_authenticated)
+    if current_user.is_authenticated:
+        user = UserModel.query.get(current_user.id)
+        initials = user.fornavn[0].upper() + user.efturnavn[0].upper()
+        return {'authenticated': True, 'initials': initials}
+    return {'authenticated': False}
 
 
 ## USED TO SEND SMS's TO THE END USER ##

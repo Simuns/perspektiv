@@ -19,17 +19,17 @@
                     </div>
                     {% block header %}
                     {% endblock %}
-                    <div class="login-small">
                     {% if authenticated %}
-                    <a href="/profilur">
-                        <img src="{{ url_for('static', filename='login-small-pink.png') }}">
-                    </a>
+                    <form action="/profilur">
+                        <button class="button-17" role="button">{{  initials  }}</button>
+                    </form>
                     {% else %}
-                    <a href="/ritainn">
-                        <img src="{{ url_for('static', filename='login-small.png') }}">
-                    </a>
-                    {% endif %}
+                    <div class="login-small">
+                        <a href="/ritainn">
+                            <img src="{{ url_for('static', filename='login-small.png') }}">
+                        </a>        
                     </div>
+                    {% endif %}
                 </div>
             </nav>
 

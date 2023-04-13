@@ -311,20 +311,6 @@ def initdb_command():
             db.create_all()
             print('Initialized the database.')
 
-@app.cli.command('dbq')
-def dbq_command():
-    entry = artiklar.query.filter_by(id='455313cd').first()
-# If the entry was found, retrieve the two articles written prior to it
-    if entry:
-        two_articles_prior = artiklar.query.filter(
-            artiklar.created_stamp < entry.created_stamp,
-            artiklar.verified == True
-        ).order_by(artiklar.created_stamp.desc()).limit(2).all()
-        seinastu_artiklar_dict = latest_articles_dict(two_articles_prior)
-        for dict in seinastu_artiklar_dict:
-            print(seinastu_artiklar_dict[dict]['yvirskrift'])
-
-
 
 def rowToDict(row):
     newDict = row.__dict__

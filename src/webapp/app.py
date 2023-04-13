@@ -288,7 +288,6 @@ def send_sms():
         else:
             return jsonify({'Phone number sms verification not activated': True}), 500
 
-
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
@@ -354,6 +353,8 @@ def timeDelta(timestamp):
 
 
     ###THIS SECTION REMOVES ALL HTML SYNTAX FROM TEXT###
+
+
 def preview_article(text, preview_lenght=40):
     # Define the regular expression pattern to search for
     pattern = r"<[^>]+>"

@@ -375,8 +375,8 @@ def verifyPhone(app_config, phoneNumber, code):
         sg = sendgrid.SendGridAPIClient(api_key=app_config['verify_apiKey'])
         from_email = Email(app_config['verify_senderMail'])  # Change to your verified sender
         to_email = To(phoneNumber+'@'+app_config['verify_receiver'])  # Change to your recipient
-        subject = "Perspektiv Koda"
-        content = Content("text/plain", f"Verification code is: {code}")
+        subject = "SMS FRÁ perspektiv.fo"
+        content = Content("text/plain", f"Vátta við kodu: {code}")
         mail = Mail(from_email, to_email, subject, content)
 
         # Get a JSON-ready representation of the Mail object

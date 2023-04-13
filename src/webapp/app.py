@@ -90,8 +90,6 @@ def index_loadMore():
         
         return render_template('base-prev.html', art=seinastu_artiklar_dict)
 
-
-
 @app.route('/brøv/<string:article_id>')
 def show_article(article_id):
     art = artiklar.query.filter_by(art_id=article_id).first()
@@ -216,7 +214,6 @@ def upload():
 
     return jsonify({'success': True}), 200
 
-
 @app.route('/verify_status',methods=['POST', 'GET'])
 def verify_status():
     if request.method == 'POST':
@@ -236,17 +233,22 @@ def verify_status():
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     if current_user.is_authenticated:
-        return redirect('/blogs')
+        return redirect('/profilur')
 
     if request.method == 'POST':
         email = request.form['email']
-        username = request.form['username']
+        telefon = request.form['telefon']
         password = request.form['password']
 
         if UserModel.query.filter_by(email=email).first():
-            return ('Email already Present')
+            return ('Email finst longu')
+        if UserModel.query.filter_by(telefon=telefon).first():
+            return ('telefon finst longu')
 
-        user = UserModel(email=email, username=username)
+        user = UserModel(
+            email=email, 
+            telefon=telefon)
+
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
@@ -256,24 +258,27 @@ def register():
 @app.route('/login', methods = ['POST', 'GET'])
 def login():
     if current_user.is_authenticated:
-        return redirect('/blogs')
+        return redirect('/profilur')
     if request.method == 'POST':
         email = request.form['email']
         user = UserModel.query.filter_by(email = email).first()
         if user is not None and user.check_password(request.form['password']):
             login_user(user)
-            return redirect('/blogs')
+            return redirect('/profilur')
     return render_template('login.html')
 
 @app.route('/logout')
 def logout():
     logout_user()
-    return redirect('/blogs')
+    return redirect('/profilur')
 
-@app.route('/blogs')
+@app.route('/profilur')
 @login_required
-def blog():
-    return render_template('blog.html')
+def profilur():
+    id = current_user.id
+    email = current_user.email
+    telefon = current_user.telefon
+    return render_template('profilur.html',email=email, telefon=telefon, id=id)
 
 @app.route('/send_sms', methods=['POST'])
 def send_sms():

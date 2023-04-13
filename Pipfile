@@ -14,6 +14,7 @@ pyyaml = "*"
 pillow = "*"
 werkzeug = "*"
 flask_login = "*"
+"zope.interface" = "==6.0"
 
 [dev-packages]
 

@@ -30,6 +30,8 @@ class UserModel(UserMixin, db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(80), unique=True)
+    fornavn = db.Column(db.String(50), nullable=True)
+    efturnavn = db.Column(db.String(50), nullable=True)
     telefon = db.Column(db.String(6), nullable=True)
     password_hash = db.Column(db.String())
 

@@ -191,6 +191,22 @@ footer {
     height:auto;
 }
 
+.login-small {
+    position:relative;
+    display: table;
+    padding-left: 10px;
+}
+
+.login-small img{
+    padding-top: 3px;
+    max-width: 53px;
+    height:auto;
+    vertical-align: middle;
+    display: table-cell;
+    margin:0 auto;
+}
+
+
 .favicon img{
     border-radius: 50%;
 }

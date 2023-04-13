@@ -248,10 +248,10 @@ def register():
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
-        return redirect('/login')
+        return redirect('/ritainn')
     return render_template('register.html')
 
-@app.route('/login', methods = ['POST', 'GET'])
+@app.route('/ritainn', methods = ['POST', 'GET'])
 def login():
     if current_user.is_authenticated:
         return redirect('/profilur')
@@ -261,7 +261,7 @@ def login():
         if user is not None and user.check_password(request.form['password']):
             login_user(user)
             return redirect('/profilur')
-    return render_template('login.html')
+    return render_template('ritainn.html')
 
 @app.route('/logout')
 def logout():
@@ -370,6 +370,14 @@ def preview_article(text, preview_lenght=40):
     else:
         shortened_text = " ".join(words[:preview_lenght])
         return "<p>"+shortened_text+"..."+"</p>"
+
+
+## THIS LOADS CONTENT THAT IS AVAILABLE ON ALL PAGES ##
+## I NEED USER AUTHENTICATION STATUS TO BE AWARE IF  ##
+## LOGIN BUTTON SHOULD EXSIST OR NOT                 ##
+@app.context_processor
+def inject_auth():
+    return dict(authenticated=current_user.is_authenticated)
 
 
 ## USED TO SEND SMS's TO THE END USER ##

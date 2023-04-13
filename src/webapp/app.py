@@ -22,10 +22,11 @@ from PIL import Image
 from webapp.database import db, artiklar, UserModel, login
 from flask_login import login_required, current_user, login_user, logout_user
 
-
 # Load settings defined in config.yaml
 app_config = app_config()
 
+#regex
+import re
 
 
 app = Flask(__name__)
@@ -364,7 +365,7 @@ def timeDelta(timestamp):
             return f"{days_ago} dagar síðani"
 
 def preview_article(text, preview_lenght=40):
-    import re
+    
 
     ###THIS SECTION REMOVES ALL HTML SYNTAX FROM TEXT###
     # Define the regular expression pattern to search for
@@ -383,7 +384,7 @@ def preview_article(text, preview_lenght=40):
         return "<p>"+shortened_text+"..."+"</p>"
 
 
-def verifyPhone(config, phoneNumber, code):
+def verifyPhone(app_config, phoneNumber, code):
     if app_config['verifyPhone']:
         sg = sendgrid.SendGridAPIClient(api_key=app_config['verify_apiKey'])
         from_email = Email(app_config['verify_senderMail'])  # Change to your verified sender

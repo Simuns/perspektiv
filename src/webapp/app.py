@@ -1,8 +1,8 @@
 #flask and database support
 from flask import Flask, render_template, request, jsonify, redirect, url_for, send_from_directory
 
-
-
+#loading settings defined in the settings.yaml file
+from webapp.settings import app_config
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc, text
 # Used for creating id's for articles
@@ -13,42 +13,35 @@ from datetime import datetime, timedelta
 import sendgrid
 import os
 from sendgrid.helpers.mail import Mail, Email, To, Content
-import yaml
-# generate code
+
+# generate verification code
 import random
 # Used for picture reduction in size
 from PIL import Image
 
+from webapp.database import db, artiklar, UserModel, login
+from flask_login import login_required, current_user, login_user, logout_user
 
 
-#### load configurations ####
-# Get the absolute path of the grandparent directory (3 layers up)
-rootdir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
-# Load the file from the grandparent directory
-file_path = os.path.join(rootdir, "config.yaml")
-with open(file_path, "r") as file:
-    # Read the contents of the file
-    config = yaml.safe_load(file)
+# Load settings defined in config.yaml
+app_config = app_config()
+
 
 
 app = Flask(__name__)
+# THE SECRET IS USED FOR CREATING CLIENT SESSIONS AND ENCRYPTING THEM
+app.secret_key = app_config['secret_key']
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///artiklar.db'
-db = SQLAlchemy(app)
+# THIS SETTING MAKES DATABASE FASTER AND MORE RELIABLE
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+
+db.init_app(app)
+login.init_app(app)
+login.login_view = 'login'
 
 
 
-class artiklar(db.Model):
-    id = db.Column(db.String(8), primary_key=True)
-    fornavn = db.Column(db.String(50), nullable=True)
-    efturnavn = db.Column(db.String(50), nullable=True)
-    stovnur = db.Column(db.String(120), nullable=True)
-    telefon = db.Column(db.String(6), nullable=True)
-    yvirskrift = db.Column(db.String(120), nullable=True)
-    skriv = db.Column(db.Text)
-    picture_path = db.Column(db.String(length=120), nullable=True)
-    created_stamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
-    verified = db.Column(db.Boolean, default=False)
-    vercode = db.Column(db.String(6), nullable=True)
 
 @app.route('/')
 def index():
@@ -99,15 +92,6 @@ def index_loadMore():
 
 
 
-
-
-
-
-
-
-
-
-
 @app.route('/brøv/<string:article_id>')
 def show_article(article_id):
     art = artiklar.query.filter_by(id=article_id).first()
@@ -133,7 +117,7 @@ def skriva():
         quill_data = request.form.get('text')
         print("request form",request.form)
         
-        if config["verifyPhone"]:
+        if app_config["verifyPhone"]:
             #generate code
             code = random.randint(100000, 999999)
         art = artiklar.query.filter_by(id=session_id).first()
@@ -146,7 +130,7 @@ def skriva():
             art.yvirskrift=yvirskrift
             art.skriv=quill_data
             art.created_stamp = datetime.utcnow()
-            if config["verifyPhone"]:
+            if app_config["verifyPhone"]:
                 art.vercode=code
             else:
                 art.verified=True
@@ -162,14 +146,14 @@ def skriva():
                 yvirskrift=yvirskrift,
                 skriv=quill_data,
                 created_stamp = datetime.utcnow(),
-                vercode = code if config["verifyPhone"] else None,
-                verified = False if config["verifyPhone"] else True
+                vercode = code if app_config["verifyPhone"] else None,
+                verified = False if app_config["verifyPhone"] else True
                 )
 
             db.session.add(nytt_skriv)
             db.session.commit()
 
-        if config["verifyPhone"]:
+        if app_config["verifyPhone"]:
             verifyPhone(config, telefon, code)
             return render_template('verify.html', session_id=session_id, telefon=telefon)
         else:
@@ -249,14 +233,56 @@ def verify_status():
         else:
             return render_template('verify.html', session_id=session_id, telefon=art.telefon, status="Kodan var skeiv, prøva umaftur!")
 
+@app.route('/register', methods=['POST', 'GET'])
+def register():
+    if current_user.is_authenticated:
+        return redirect('/blogs')
+
+    if request.method == 'POST':
+        email = request.form['email']
+        username = request.form['username']
+        password = request.form['password']
+
+        if UserModel.query.filter_by(email=email).first():
+            return ('Email already Present')
+
+        user = UserModel(email=email, username=username)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
+        return redirect('/login')
+    return render_template('register.html')
+
+@app.route('/login', methods = ['POST', 'GET'])
+def login():
+    if current_user.is_authenticated:
+        return redirect('/blogs')
+    if request.method == 'POST':
+        email = request.form['email']
+        user = UserModel.query.filter_by(email = email).first()
+        if user is not None and user.check_password(request.form['password']):
+            login_user(user)
+            return redirect('/blogs')
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect('/blogs')
+
+@app.route('/blogs')
+@login_required
+def blog():
+    return render_template('blog.html')
+
 @app.route('/send_sms', methods=['POST'])
 def send_sms():
     if request.method == 'POST':
-        if config["verifyPhone"]:
+        if app_config["verifyPhone"]:
             data = request.get_json()
             session_id = data.get('session_id')
             art = artiklar.query.filter_by(id=session_id).first()
-            verifyPhone(config, art.telefon, art.vercode)
+            verifyPhone(app_config, art.telefon, art.vercode)
             return jsonify({'success': True}), 200
         else:
             return jsonify({'Phone number sms verification not activated': True}), 500
@@ -264,7 +290,7 @@ def send_sms():
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+                                'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 @app.cli.command('initdb')
@@ -353,10 +379,10 @@ def preview_article(text, preview_lenght=40):
 
 
 def verifyPhone(config, phoneNumber, code):
-    if config['verifyPhone']:
-        sg = sendgrid.SendGridAPIClient(api_key=config['verify_apiKey'])
-        from_email = Email(config['verify_senderMail'])  # Change to your verified sender
-        to_email = To(phoneNumber+'@'+config['verify_receiver'])  # Change to your recipient
+    if app_config['verifyPhone']:
+        sg = sendgrid.SendGridAPIClient(api_key=app_config['verify_apiKey'])
+        from_email = Email(app_config['verify_senderMail'])  # Change to your verified sender
+        to_email = To(phoneNumber+'@'+app_config['verify_receiver'])  # Change to your recipient
         subject = "Perspektiv Koda"
         content = Content("text/plain", f"Verification code is: {code}")
         mail = Mail(from_email, to_email, subject, content)

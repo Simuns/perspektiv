@@ -1,3 +1,7 @@
+
+# Secret key used to encrypt login sessions
+secret_key: 'qwer'
+
 ##### verify phone number smtp settings using sendgrid ####
 ## set verifyPhone to true and populate other verify_ options if you wish sms verification on creation of articles
 verifyPhone: False 

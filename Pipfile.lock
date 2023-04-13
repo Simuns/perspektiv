@@ -1,13 +1,10 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "630bc77df0f327e61ad4feb34683258f6b2111f793698cc2c188f82766dc923d"
+            "sha256": "a6e658692a82373b0762e0c39735df45b9455ed6a3fee69dba82bc25ca147362"
         },
         "pipfile-spec": 6,
-        "requires": {
-            "python_full_version": "3.10.9",
-            "python_version": "3.10"
-        },
+        "requires": {},
         "sources": [
             {
                 "name": "pypi",
@@ -40,6 +37,14 @@
             ],
             "index": "pypi",
             "version": "==2.2.3"
+        },
+        "flask-login": {
+            "hashes": [
+                "sha256:1ef79843f5eddd0f143c2cd994c1b05ac83c0401dc6234c143495af9a939613f",
+                "sha256:c0a7baa9fdc448cdd3dd6f0939df72eec5177b2f7abe6cb82fc934d29caac9c3"
+            ],
+            "index": "pypi",
+            "version": "==0.6.2"
         },
         "flask-sqlalchemy": {
             "hashes": [
@@ -409,7 +414,7 @@
                 "sha256:2e1ccc9417d4da358b9de6f174e3ac094391ea1d4fbef2d667865d819dfd0afe",
                 "sha256:56433961bc1f12533306c624f3be5e744389ac61d722175d543e1751285da612"
             ],
-            "markers": "python_version >= '3.7'",
+            "index": "pypi",
             "version": "==2.2.3"
         },
         "zope.interface": {

@@ -12,6 +12,8 @@ datetime = "*"
 sendgrid = "*"
 pyyaml = "*"
 pillow = "*"
+werkzeug = "*"
+flask_login = "*"
 
 [dev-packages]
 

@@ -69,7 +69,7 @@ def index_loadMore():
 
     ## find older articles than the last one on the page
 
-    entry = artiklar.query.filter_by(id=last_floating_box_id).first()
+    entry = artiklar.query.filter_by(art_id=last_floating_box_id).first()
     ## If the entry was found, retrieve the two articles written prior to it ##
     if entry:
         two_articles_prior = artiklar.query.filter(
@@ -94,7 +94,7 @@ def index_loadMore():
 
 @app.route('/brøv/<string:article_id>')
 def show_article(article_id):
-    art = artiklar.query.filter_by(id=article_id).first()
+    art = artiklar.query.filter_by(art_id=article_id).first()
     if art is None:
         return render_template('error.html',error="Brævið finst ikki")
     if art.verified:
@@ -120,7 +120,7 @@ def skriva():
         if app_config["verifyPhone"]:
             #generate code
             code = random.randint(100000, 999999)
-        art = artiklar.query.filter_by(id=session_id).first()
+        art = artiklar.query.filter_by(art_id=session_id).first()
         if art:
             print("USER FOUND WITH SESSION ID:",session_id,"updating user")
             art.fornavn=fornavn
@@ -138,7 +138,7 @@ def skriva():
         else:
             print("NO USER FOUND WITH USER ID",session_id)
             nytt_skriv = artiklar(
-                id=session_id,
+                art_id=session_id,
                 fornavn=fornavn,
                 efturnavn=efturnavn,
                 stovnur=stovnur,
@@ -154,7 +154,7 @@ def skriva():
             db.session.commit()
 
         if app_config["verifyPhone"]:
-            verifyPhone(config, telefon, code)
+            verifyPhone(app_config, telefon, code)
             return render_template('verify.html', session_id=session_id, telefon=telefon)
         else:
             return redirect(url_for('index'))
@@ -209,7 +209,7 @@ def upload():
 
     ## add picture path to database ##
     nyggj_mynd = artiklar(
-        id=session_id,
+        art_id=session_id,
         picture_path=picture_filename_jpg)
     db.session.add(nyggj_mynd)
     db.session.commit()
@@ -222,7 +222,7 @@ def verify_status():
     if request.method == 'POST':
         session_id = request.form['session_id']
         verified_code = request.form['verification_code']
-        art = artiklar.query.filter_by(id=session_id).first()
+        art = artiklar.query.filter_by(art_id=session_id).first()
         if verified_code == art.vercode:
             if art:
                 print("USER FOUND WITH SESSION ID:",session_id,"updating verified status")

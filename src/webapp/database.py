@@ -11,7 +11,7 @@ db = SQLAlchemy()
 
 ## DEFINE ARTILCE TABLE ##
 class artiklar(db.Model):
-    id = db.Column(db.String(8), primary_key=True)
+    art_id = db.Column(db.String(8), primary_key=True)
     fornavn = db.Column(db.String(50), nullable=True)
     efturnavn = db.Column(db.String(50), nullable=True)
     stovnur = db.Column(db.String(120), nullable=True)

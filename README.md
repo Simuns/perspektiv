@@ -29,8 +29,16 @@ My goal was to write something beautiful with as little code as possible. Althou
 # installation guides
 ## Install via docker
 
+
+### You can test the app with following quick setup:
 * build container `docker build -t perspektiv:latest github.com/simuns/perspektiv`
 * activating container `docker run --rm -p 5000:5000 perspektiv`
+---
+### A more production ready setup with data mount.
+* clone `git clone https://github.com/simuns/perspektiv.git`
+* change dir `cd perspektiv`
+* docker-compose up -d
+
 
 ## Install via pipenv
 
@@ -39,7 +47,5 @@ My goal was to write something beautiful with as little code as possible. Althou
     * `cd perspektiv`
 * install dependencies to git environment `pipenv install`
 * activate environment `pipenv shell`
-* Create database
     * `cd src/webapp/`
-    * `flask initdb`
 * run webserver `flask run`

@@ -1,6 +1,4 @@
-FROM python:3.10
-
-RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
+FROM python:3.10-slim
 
 RUN pip install pipenv
 
@@ -14,7 +12,7 @@ RUN pipenv install --system --clear
 
 COPY ./ ${SRC_DIR}/
 
-RUN mkdir ${SRC_DIR}/src/webapp/static/uploads
+RUN mkdir -p ${SRC_DIR}/src/webapp/static/uploads
 
 WORKDIR ${SRC_DIR}/src/webapp
 

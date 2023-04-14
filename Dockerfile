@@ -16,4 +16,6 @@ RUN mkdir ${SRC_DIR}/src/webapp/static/uploads
 
 WORKDIR ${SRC_DIR}/src/webapp
 
+DOCKER_OPTS="--dns 8.8.8.8"
+
 CMD flask initdb && flask run -h 0.0.0.0

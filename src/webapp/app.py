@@ -28,8 +28,15 @@ app = Flask(__name__)
 app.secret_key = app_config['secret_key']
 # Get the current working directory
 current_dir = os.getcwd()
+
+#create data folders if they dont exsist
+folders_to_create = [f"{current_dir}/database", f"{current_dir}/static/uploads"]
+for create_folder in folders_to_create:    
+    if not os.path.exists(create_folder):
+        os.mkdir(create_folder)
+
 # Set the database URI using string formatting
-app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{current_dir}/database.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{current_dir}/database/database.db'
 # THIS SETTING MAKES DATABASE FASTER AND MORE RELIABLE
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 current_dir = os.getcwd()

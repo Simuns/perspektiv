@@ -37,7 +37,7 @@ My goal was to write something beautiful with as little code as possible. Althou
 ### A more production ready setup with data mount.
 * clone `git clone https://github.com/simuns/perspektiv.git`
 * change dir `cd perspektiv`
-* docker-compose up -d
+* Then wallah `docker-compose up -d`
 
 
 ## Install via pipenv

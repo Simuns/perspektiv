@@ -1,5 +1,7 @@
 FROM python:3.10
 
+RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf
+
 RUN pip install pipenv
 
 ENV SRC_DIR /usr/local/src/container

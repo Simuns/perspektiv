@@ -23,7 +23,6 @@ app_config = app_config()
 #regex
 import re
 
-
 app = Flask(__name__)
 # THE SECRET IS USED FOR CREATING CLIENT SESSIONS AND ENCRYPTING THEM
 app.secret_key = app_config['secret_key']
@@ -31,6 +30,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 # THIS SETTING MAKES DATABASE FASTER AND MORE RELIABLE
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+print("database location", app.config['SQLALCHEMY_DATABASE_URI'])
 
 db.init_app(app)
 login.init_app(app)

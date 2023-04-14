@@ -12,8 +12,6 @@ RUN pipenv install --system --clear
 
 COPY ./ ${SRC_DIR}/
 
-RUN mkdir -p ${SRC_DIR}/src/webapp/static/uploads
-
 WORKDIR ${SRC_DIR}/src/webapp
 
 CMD flask run -h 0.0.0.0

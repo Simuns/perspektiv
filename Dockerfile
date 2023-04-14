@@ -16,4 +16,4 @@ RUN mkdir -p ${SRC_DIR}/src/webapp/static/uploads
 
 WORKDIR ${SRC_DIR}/src/webapp
 
-CMD flask initdb && flask run -h 0.0.0.0
+CMD flask run -h 0.0.0.0

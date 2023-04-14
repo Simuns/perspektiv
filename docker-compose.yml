@@ -5,4 +5,4 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - "./data/:/usr/local/src/container/src/static/"
+      - "./data/:/usr/local/src/container/src/webapp/"

@@ -26,10 +26,13 @@ import re
 app = Flask(__name__)
 # THE SECRET IS USED FOR CREATING CLIENT SESSIONS AND ENCRYPTING THEM
 app.secret_key = app_config['secret_key']
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+# Get the current working directory
+current_dir = os.getcwd()
+# Set the database URI using string formatting
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{current_dir}/database.db'
 # THIS SETTING MAKES DATABASE FASTER AND MORE RELIABLE
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
+current_dir = os.getcwd()
 print("database location", app.config['SQLALCHEMY_DATABASE_URI'], "WD", os.getcwd())
 
 db.init_app(app)

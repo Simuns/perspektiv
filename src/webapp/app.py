@@ -24,15 +24,6 @@ app_config = app_config()
 import re
 
 
-try:
-    with db.engine.connect() as connection:
-        connection.execute(text('SELECT * FROM artiklar'))
-        print('Database already exists.')
-except exc.OperationalError:
-    db.create_all()
-    print('Initialized the database.')
-
-
 app = Flask(__name__)
 # THE SECRET IS USED FOR CREATING CLIENT SESSIONS AND ENCRYPTING THEM
 app.secret_key = app_config['secret_key']
@@ -44,6 +35,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 login.init_app(app)
 login.login_view = 'login'
+
+
 
 
 @app.route('/')

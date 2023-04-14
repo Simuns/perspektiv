@@ -30,7 +30,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 # THIS SETTING MAKES DATABASE FASTER AND MORE RELIABLE
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-print("database location", app.config['SQLALCHEMY_DATABASE_URI'])
+print("database location", app.config['SQLALCHEMY_DATABASE_URI'], "WD", os.getcwd())
 
 db.init_app(app)
 login.init_app(app)

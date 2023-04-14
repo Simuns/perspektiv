@@ -5,5 +5,5 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - "./database:/usr/local/src/container/src/webapp/"
+      - "./database:/usr/local/src/container/src/webapp/database"
       - "./uploads:/usr/local/src/container/src/webapp/static/uploads/"

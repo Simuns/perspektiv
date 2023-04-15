@@ -6,16 +6,10 @@ from webapp.database import db, artiklar,UserModel, Verification
 from webapp.app import app
 
 
-
-
 # Load configurations
 app_config = app_config()
 
-
-
-
-
-def verify(id, context, method, recipients, resend=False):
+def send_verification(id, context, method, recipients, resend=False):
 
     with app.app_context():
         verification = db.session.query(Verification).filter((Verification.article_id == id) | (Verification.user_id == id)).first()
@@ -24,7 +18,7 @@ def verify(id, context, method, recipients, resend=False):
                 # Delete previous verifications set by this user or article
                 db.session.delete(verification)
                 # Create new verification
-                verification = Verification(status='pending', method=method)
+            verification = Verification(status='pending', method=method)
 
         if context == "user":
             verification.user_id = id
@@ -34,16 +28,17 @@ def verify(id, context, method, recipients, resend=False):
 
                 
         if method == "sms": 
-            code_sms = sendVerification(app_config, recipients, "sms")
+            code_sms = send(app_config, recipients, "sms")
             verification.code_sms = code_sms
 
         if method == "email":
-            code_email = sendVerification(app_config, recipients, "email")
+            code_email = send(app_config, recipients, "email")
             verification.code_email = code_email
 
         if method == "both":
-            code_sms = sendVerification(app_config, recipients[0], "sms")
-            code_email = sendVerification(app_config, recipients[1], "email")
+            telefon, email = recipients
+            code_sms = send(app_config, telefon, "sms")
+            code_email = send(app_config, email, "email")
             verification.code_sms = code_sms
             verification.code_email = code_email
 
@@ -54,7 +49,7 @@ def verify(id, context, method, recipients, resend=False):
 
 ## USED TO SEND SMS's TO THE END USER ##
 # THIS IS ACHIEVED BY FIRST SENDING MAIL TO MAIL->SMS RELAY #
-def sendVerification(app_config, recipient, verifyType):
+def send(app_config, recipient, verifyType):
     code = random.randint(100000, 999999)
     sg = sendgrid.SendGridAPIClient(api_key=app_config['verify_apiKey'])
     from_email = Email(app_config['verify_senderMail'])  # Change to your verified sender
@@ -79,3 +74,40 @@ def sendVerification(app_config, recipient, verifyType):
     print(response.status_code)
     print(response.headers)
     return code
+
+
+def verify(id, method, code):
+    with app.app_context():
+        verify = db.session.query(Verification).filter((Verification.article_id == id) | (Verification.user_id == id)).first()
+
+        if method == "sms" and verify.code_sms == code:
+            verify.status = "verified"
+            db.session.commit()
+            return "verified"
+
+        elif method == "email" and verify.code_email == code:
+            verify.status = "verified"
+            db.session.commit()
+            return "verified"
+
+        elif verify.method == "both":
+            if verify.status == "pending" and method == "email" and verify.code_email == code:
+                verify.status = "email"
+                db.session.commit()
+                return "verified"
+            
+            elif verify.status == "pending" and method == "sms" and verify.code_sms == code:
+                verify.status = "sms"
+                db.session.commit()
+                return "verified"
+            
+            elif verify.status == "sms" and method == "email" and verify.code_email == code:
+                verify.status = "verified"
+                db.session.commit()
+                return "verified"
+
+            elif verify.status == "email" and method == "sms" and verify.code_sms == code:
+                verify.status = "verified"
+                db.session.commit()
+                return "verified"
+    return "unverified"

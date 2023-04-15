@@ -395,9 +395,6 @@ def inject_auth():
     return {'authenticated': False}
 
 
-print (verify(12345678, "email", "955786"))
-
-
 ## KEEP APP RUNNING ##
 if __name__ == "__main__":
     app.run(debug=True)

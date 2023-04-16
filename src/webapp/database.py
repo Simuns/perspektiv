@@ -28,7 +28,7 @@ class artiklar(db.Model):
 class UserModel(UserMixin, db.Model):
     __tablename__ = 'users'
 
-    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(10), primary_key=True)
     email = db.Column(db.String(80), unique=True)
     fornavn = db.Column(db.String(50), nullable=True)
     efturnavn = db.Column(db.String(50), nullable=True)
@@ -38,6 +38,8 @@ class UserModel(UserMixin, db.Model):
     
     verify = db.relationship("Verification", back_populates="user")
 
+    def get_id(self):
+        return self.user_id
 
     def set_password(self,password):
         self.password_hash = generate_password_hash(password)
@@ -49,12 +51,13 @@ class Verification(db.Model):
     __tablename__ = 'verify'
 
     id = db.Column(db.Integer, primary_key=True)
-    code_sms = db.Column(db.String)
-    code_email = db.Column(db.String)
+    code_sms = db.Column(db.String(6))
+    code_email = db.Column(db.String(36))
     method = db.Column(db.String)
     status = db.Column(db.String)
+    verified_stamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    user_id = db.Column(db.String, db.ForeignKey('users.user_id'), nullable=True)
     article_id = db.Column(db.String, db.ForeignKey('artiklar.art_id'), nullable=True)
     
     user = db.relationship("UserModel", back_populates="verify")
@@ -65,7 +68,7 @@ from flask_login import LoginManager
 login = LoginManager()
 
 @login.user_loader
-def load_user(id):
-    return UserModel.query.get(int(id))
+def load_user(user_id):
+    return UserModel.query.get(str(user_id))
 
 

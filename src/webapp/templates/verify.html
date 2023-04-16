@@ -27,6 +27,7 @@
 </form>
 <form name="resend-SMS" method="POST">
     <input type="hidden" name="session_id" value="{{ session_id }}">
+    <input type="hidden" name="telefon" value="{{ telefon }}">
     <button 
         type="submit">
         Send nýggjan sms til {{ telefon }}

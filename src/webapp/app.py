@@ -27,7 +27,7 @@ import re
 
 app = Flask(__name__)
 #importing webapp after initialization of app
-from webapp.verify import send_verification, verify
+from webapp.verify import send_verification, verify, whitelist
 
 app_config = app_config()
 # THE SECRET IS USED FOR CREATING CLIENT SESSIONS AND ENCRYPTING THEM
@@ -75,7 +75,7 @@ def index():
         time_delta = timeDelta(seinastu_artiklar_dict[article]["created_stamp"])
         seinastu_artiklar_dict[article]["time_delta"] = time_delta
 
-        
+        print(seinastu_artiklar_dict)
         preview_text = preview_article(seinastu_artiklar_dict[article]["skriv"])
         seinastu_artiklar_dict[article]["preview_text"] = preview_text
 
@@ -130,7 +130,7 @@ def skriva():
         telefon = request.form['telefon']
         yvirskrift = request.form['yvirskrift']
         quill_data = request.form.get('text')
-
+        print(request.form.get('text'))
         art = artiklar.query.filter_by(art_id=session_id).first()
         if art:
             print("USER FOUND WITH SESSION ID:",session_id,"updating user")
@@ -156,12 +156,13 @@ def skriva():
                 )
 
             db.session.add(nytt_skriv)
-            db.session.commit()
+        db.session.commit()
 
         if app_config["verifyPhone"]:
             send_verification(session_id, "article", "sms", telefon)
             return render_template('verify.html', session_id=session_id, telefon=telefon)
         else:
+            whitelist(session_id)
             return redirect(url_for('index'))
     session_id = str(uuid.uuid4())[:8]
     return render_template('skriva.html', session_id=session_id)
@@ -226,13 +227,22 @@ def verify_status():
     if request.method == 'POST':
         session_id = request.form['session_id']
         verified_code = request.form['verification_code']
-        verifyStatus = verify(session_id, "sms", verified_code)
+        verifyStatus = verify(verified_code, session_id)
         if verifyStatus == "verified":
             return render_template('verify_success.html')
         else:
             art = artiklar.query.filter_by(art_id=session_id).first()
             return render_template('verify.html', session_id=session_id, telefon=art.telefon, status="Kodan var skeiv, prøva umaftur!")
-app.route('/register', methods=['POST', 'GET'])
+
+@app.route('/aktivera/<string:code_email>')
+def aktivera(code_email):
+    match = verify(code_email)
+    if match == "verified":
+        return("success")
+    else: 
+        return("false")
+
+@app.route('/register', methods=['POST', 'GET'])
 def register():
     if current_user.is_authenticated:
         return redirect('/profilur')
@@ -248,8 +258,12 @@ def register():
             return ('Email finst longu')
         if UserModel.query.filter_by(telefon=telefon).first():
             return ('telefon finst longu')
-
+        # generate id with 10 Characters
+        uuid_obj = uuid.uuid4()
+        user_id = uuid_obj.hex[:10]
+        
         user = UserModel(
+            user_id = user_id,
             email=email,
             fornavn=fornavn,
             efturnavn=efturnavn,
@@ -259,8 +273,14 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        return redirect('/ritainn')
-    return render_template('register.html')
+        if app_config["verifyPhone"]:
+            send_verification(user_id, "both", [telefon, email])
+            return render_template('verify.html', session_id=user_id, telefon=telefon)
+        else: 
+            whitelist(user_id)
+            return render_template('ritainn.html')
+    else:
+        return render_template('register.html')
 
 @app.route('/ritainn', methods = ['POST', 'GET'])
 def login():
@@ -282,10 +302,10 @@ def logout():
 @app.route('/profilur')
 @login_required
 def profilur():
-    id = current_user.id
+    user_id = current_user.user_id
     email = current_user.email
     telefon = current_user.telefon
-    return render_template('profilur.html',email=email, telefon=telefon, id=id)
+    return render_template('profilur.html',email=email, telefon=telefon, user_id=user_id)
 
 @app.route('/send_sms', methods=['POST'])
 def send_sms():
@@ -293,8 +313,9 @@ def send_sms():
         if app_config["verifyPhone"]:
             data = request.get_json()
             session_id = data.get('session_id')
-            art = artiklar.query.filter_by(id=session_id).first()
-            send_verification(session_id, "article", "sms", art.telefon)
+            telefon = data.get('telefon')
+            print(telefon)
+            send_verification(session_id, "sms", telefon, True)
             return jsonify({'success': True}), 200
         else:
             return jsonify({'Phone number sms verification not activated': True}), 500
@@ -367,6 +388,7 @@ def timeDelta(timestamp):
 
 
 def preview_article(text, preview_lenght=40):
+    print("text",text)
     # Define the regular expression pattern to search for
     pattern = r"<[^>]+>"
     # Define the replacement string
@@ -389,12 +411,13 @@ def preview_article(text, preview_lenght=40):
 @app.context_processor
 def inject_auth():
     if current_user.is_authenticated:
-        user = UserModel.query.get(current_user.id)
+        user = UserModel.query.get(current_user.user_id)
         initials = user.fornavn[0].upper() + user.efturnavn[0].upper()
         return {'authenticated': True, 'initials': initials}
     return {'authenticated': False}
 
-
+#send_verification("781", "user", "email", ["simunhojgaard@gmail.com"])
+#http://localhost:5000/aktivera/d0319a9f-1846-4948-87d0-111b6aa0a268verify("605320", "780")
 ## KEEP APP RUNNING ##
 if __name__ == "__main__":
     app.run(debug=True)

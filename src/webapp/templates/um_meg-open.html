@@ -1,0 +1,28 @@
+
+<div class="edit-open" id="navn">
+    <p>Fornavn <input type = "fornavn" name = "fornavn" value="{{ user.fornavn }}" /></p>
+    <p>Efturnavn <input type = "efturnavn" name = "efturnavn" value="{{ user.efturnavn }}"/></p>
+
+</div>
+
+<div class="edit-open" id="stovnur">
+    <p>stovnur/felagskapur <input type = "text" name = "stovnur" value="{{ user.stovnur }}" /></p>
+</div>
+
+<div class="edit-open" id="telefon">
+    <p>Telefon nummar <input type = "text" name = "telefon" value="{{ user.telefon }}"/></p>
+</div>
+<div class="edit-open" id="mynd">
+    <label for="file">Vel eina mynd:</label><br>
+    <form id="upload-form">
+        <input type="hidden" name="session_id" value="{{user.user_id}}">
+        <input type="file" name="picture" >
+        <button class="btn" type="submit" >Upload</button><br>
+        <script src="{{ url_for('static', filename='upload.js') }}"></script>
+        <div id="message"></div>
+    </form>
+</div>
+<div class="edit-open" id="loyniord">
+    <p>ger ein knapp her til send email við password change logic.</p>
+</div>
+<script src="{{ url_for('static', filename='queryEdit.js') }}"></script>

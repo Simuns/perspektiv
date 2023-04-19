@@ -5,10 +5,28 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='ritainn.css') }}">
 {% endblock %}
 
-{% block content %}
-    <p>Hey {{  email  }},,, títt telefonnummar er  {{ telefon }}, og id er  {{user_id}}</p>
-    <p>initials er {{initials}}</p>
+{% block left %}
+{% endblock %}
 
+
+{% block content %}
+{% if art %}
+<div class="previous-articles">
+    <table>
+        <tr>
+            <th>Yvirskrift</th>
+            <th>Dato</th>
+        </tr>
+{% for key, value in art.items() %}
+        <tr>
+            <th>{{ art[key]['yvirskrift'] }}</th>
+            <th>{{ art[key]['created_stamp']}}</th>
+        </tr>
+{% endfor %}
+    </table>
+</div>
+{% else %}
+{% endif %}
 {% endblock %}
 
 

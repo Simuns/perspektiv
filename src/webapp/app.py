@@ -8,6 +8,8 @@ from webapp.database import db, artiklar, Verification, UserModel, login
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc, text
 
+#image commpression
+
 # Used for creating id's for articles
 import uuid
 
@@ -15,9 +17,6 @@ import uuid
 from datetime import datetime, timedelta
 
 import os
-
-# Used for picture reduction in size
-from PIL import Image
 
 # handle login events
 from flask_login import login_required, current_user, login_user, logout_user
@@ -28,6 +27,8 @@ import re
 app = Flask(__name__)
 #importing webapp after initialization of app
 from webapp.verify import send_verification, verify, whitelist
+from webapp.process_picture import compress_picture, save_picture
+
 
 app_config = app_config()
 # THE SECRET IS USED FOR CREATING CLIENT SESSIONS AND ENCRYPTING THEM
@@ -75,7 +76,6 @@ def index():
         time_delta = timeDelta(seinastu_artiklar_dict[article]["created_stamp"])
         seinastu_artiklar_dict[article]["time_delta"] = time_delta
 
-        print(seinastu_artiklar_dict)
         preview_text = preview_article(seinastu_artiklar_dict[article]["skriv"])
         seinastu_artiklar_dict[article]["preview_text"] = preview_text
 
@@ -122,6 +122,7 @@ def show_article(article_id):
 
 @app.route('/skriva', methods=['POST', 'GET'])
 def skriva():
+
     if request.method == 'POST':
         session_id = request.form['session_id']
         fornavn = request.form['fornavn']
@@ -176,49 +177,10 @@ def upload():
     picture = request.files['picture']
     session_id = request.form['session_id']
 
+    ## compress picture
+    picture_filename_jpg = compress_picture(picture, session_id )
+    save_picture(session_id, picture_filename_jpg)
 
-    ## set static names 
-    picture_filename = session_id + "-" + picture.filename
-    picture_filename_jpg = os.path.splitext(picture_filename)[0] + '.jpg'
-    small_picture_filename='small-' + os.path.splitext(picture_filename)[0] + '.jpg'
-    large_picture_filename='large-' + os.path.splitext(picture_filename)[0] + '.jpg'
-    original_picture_filename =       os.path.splitext(picture_filename)[0] + '.jpg'
-
-    picture.save(f'static/uploads/orig-{picture_filename}')
-
-
-    ## Process image ##
-    open_raw_picture_filename = Image.open(f'static/uploads/orig-{picture_filename}')
-
-    if open_raw_picture_filename.mode == 'RGBA':
-        open_raw_picture_filename = open_raw_picture_filename.convert('RGB')
-
-
-    # Handeling large picture
-    width, height = open_raw_picture_filename.size
-    TARGET_WIDTH = 1000
-    coefficient = width / 1000
-    new_height = height / coefficient
-    large_picture = open_raw_picture_filename.resize((int(TARGET_WIDTH),int(new_height)),Image.ANTIALIAS)
-    large_picture.save(f"static/uploads/{large_picture_filename}")
-
-
-    # Handeling small picture
-    width, height = open_raw_picture_filename.size
-    TARGET_WIDTH = 100
-    coefficient = width / 100
-    new_height = height / coefficient
-    small_picture = open_raw_picture_filename.resize((int(TARGET_WIDTH),int(new_height)),Image.ANTIALIAS)
-    # saving small picture #
-    small_picture.save(f"static/uploads/{small_picture_filename}")
-
-
-    ## add picture path to database ##
-    nyggj_mynd = artiklar(
-        art_id=session_id,
-        picture_path=picture_filename_jpg)
-    db.session.add(nyggj_mynd)
-    db.session.commit()
 
     return jsonify({'success': True}), 200
 
@@ -302,11 +264,35 @@ def logout():
 @app.route('/profilur')
 @login_required
 def profilur():
-    user_id = current_user.user_id
-    email = current_user.email
-    telefon = current_user.telefon
-    return render_template('profilur.html',email=email, telefon=telefon, user_id=user_id)
 
+    user = UserModel.query.filter_by(user_id=current_user.user_id).first()
+    seinastu_artiklar_dbRaw = artiklar.query.join(Verification).filter(Verification.status == 'verified').join(artiklar.author).filter_by(telefon=user.telefon).all()
+    if len(seinastu_artiklar_dbRaw) == 0:
+        seinastu_artiklar_dict = False
+    else:
+        seinastu_artiklar_dict = latest_articles_dict(seinastu_artiklar_dbRaw)
+        for article in seinastu_artiklar_dict:
+            seinastu_artiklar_dict[article]["created_stamp"] = seinastu_artiklar_dict[article]["created_stamp"].strftime('%Y-%m-%d')
+
+
+    return render_template('profilur.html', art=seinastu_artiklar_dict)
+
+
+@app.route('/um_meg')
+@login_required
+def um_meg():
+    if request.method == 'POST':
+        pass
+    else:
+        user = UserModel.query.get(current_user.user_id)
+        return render_template('um_meg.html',user=user)
+
+@app.route("/um_meg/open")
+@login_required
+def um_meg_navn():
+    target_id = request.args.get('id')
+    user = UserModel.query.get(current_user.user_id)
+    return render_template('um_meg-open.html', target_id=target_id, user=user)
 @app.route('/send_sms', methods=['POST'])
 def send_sms():
     if request.method == 'POST':
@@ -385,8 +371,6 @@ def timeDelta(timestamp):
 
 
     ###THIS SECTION REMOVES ALL HTML SYNTAX FROM TEXT###
-
-
 def preview_article(text, preview_lenght=40):
     print("text",text)
     # Define the regular expression pattern to search for
@@ -416,8 +400,10 @@ def inject_auth():
         return {'authenticated': True, 'initials': initials}
     return {'authenticated': False}
 
-#send_verification("781", "user", "email", ["simunhojgaard@gmail.com"])
-#http://localhost:5000/aktivera/d0319a9f-1846-4948-87d0-111b6aa0a268verify("605320", "780")
-## KEEP APP RUNNING ##
+@app.cli.command('dbq')
+def dbq():
+    
+    user = UserModel.query.filter_by(user_id=current_user.id).first()
+
 if __name__ == "__main__":
     app.run(debug=True)

@@ -6,6 +6,9 @@ body {
     height: 95h;
     background: #fbfdfe;
     font-family: Roboto;
+    /*
+    font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    */
     text-align: left;
     color: black;
     font-size: 24px;
@@ -71,8 +74,9 @@ footer {
     background: #F7FBFD;
 }
 
-
-
+table, th, td {
+    border:1px solid black;
+}
 
 /* RESPONSIVE */
 @media all and (max-width: 550px){

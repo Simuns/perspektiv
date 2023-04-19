@@ -15,13 +15,13 @@ class artiklar(db.Model):
     fornavn = db.Column(db.String(50), nullable=True)
     efturnavn = db.Column(db.String(50), nullable=True)
     stovnur = db.Column(db.String(120), nullable=True)
-    telefon = db.Column(db.String(6), nullable=True)
+    telefon = db.Column(db.String(6), db.ForeignKey('users.telefon'), nullable=True)
     yvirskrift = db.Column(db.String(120), nullable=True)
     skriv = db.Column(db.Text)
-    picture_path = db.Column(db.String(length=120), nullable=True)
+    picture_path = db.Column(db.String(), nullable=True)
     created_stamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
-
-    verify = db.relationship("Verification", back_populates="article")
+    verify = db.relationship("Verification", back_populates="article")    
+    author = db.relationship('UserModel', back_populates='articles')
 
 
 ## DEFINE USER TABLE
@@ -32,10 +32,14 @@ class UserModel(UserMixin, db.Model):
     email = db.Column(db.String(80), unique=True)
     fornavn = db.Column(db.String(50), nullable=True)
     efturnavn = db.Column(db.String(50), nullable=True)
-    telefon = db.Column(db.String(6), nullable=True)
+    telefon = db.Column(db.String(6),unique=True, nullable=True)
     password_hash = db.Column(db.String())
     created_stamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
-    
+    picture_path = db.Column(db.String(), nullable=True)
+    stovnur = db.Column(db.String(120), nullable=True)
+    um_meg_stutt = db.Column(db.String(), nullable=True)
+
+    articles = db.relationship('artiklar', back_populates='author')
     verify = db.relationship("Verification", back_populates="user")
 
     def get_id(self):
@@ -70,5 +74,3 @@ login = LoginManager()
 @login.user_loader
 def load_user(user_id):
     return UserModel.query.get(str(user_id))
-
-

@@ -1,8 +1,12 @@
 
 <div class="edit-open" id="navn">
-    <p>Fornavn <input type = "fornavn" name = "fornavn" value="{{ user.fornavn }}" /></p>
-    <p>Efturnavn <input type = "efturnavn" name = "efturnavn" value="{{ user.efturnavn }}"/></p>
-
+    <div class="nøvn">
+        <p>Fornavn <input type = "fornavn" name = "fornavn" value="{{ user.fornavn }}" /></p>
+        <p>Efturnavn <input type = "efturnavn" name = "efturnavn" value="{{ user.efturnavn }}"/></p>
+    </div>
+    <div class="goymKnappurDiv">
+        <button class="goymKnappur" type="submit" >Goym broytingar</button>
+    </div>
 </div>
 
 <div class="edit-open" id="stovnur">
@@ -10,17 +14,34 @@
 </div>
 
 <div class="edit-open" id="telefon">
-    <p>Telefon nummar <input type = "text" name = "telefon" value="{{ user.telefon }}"/></p>
+    <p>Fyri at broyta telefon nummar, er neyðugt at vátta nýggja nummari.<br>
+        Hetta kann gerast við vátta kodu sum blívur send til nýggja nummari.
+    </p>
+    <div class="telefon-logikkur">  
+        <form id class="send-sms">
+            <p>Telefon nummar <input type = "text" name = "telefon" value="{{ user.telefon }}"/></p>
+        </form>
+        <button class="btn" form="send-sms" type="submit" >Send sms</button><br>
+    </div>
+</div>
+<div class="edit-open" id="email">
+    <p>Post adressa <input type = "text" name = "telefon" value="{{ user.email }}"/></p>
 </div>
 <div class="edit-open" id="mynd">
-    <label for="file">Vel eina mynd:</label><br>
     <form id="upload-form">
+        <label for="file">Vel eina vangamynd:</label><br>
         <input type="hidden" name="session_id" value="{{user.user_id}}">
         <input type="file" name="picture" >
         <button class="btn" type="submit" >Upload</button><br>
         <script src="{{ url_for('static', filename='upload.js') }}"></script>
         <div id="message"></div>
     </form>
+    {% if user.picture_path %}
+    <img id="large-image-preview" src="{{ url_for('static', filename='uploads/' + 'large-' + user.picture_path) }}" alt="">
+    {% else %}
+    <img id="large-image-preview" src="" alt="">
+    {% endif %}
+
 </div>
 <div class="edit-open" id="loyniord">
     <p>ger ein knapp her til send email við password change logic.</p>

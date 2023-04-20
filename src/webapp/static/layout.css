@@ -247,3 +247,13 @@ table, th, td {
 .favicon img{
     border-radius: 50%;
 }
+
+.user-pic-small{
+    padding-left: 10px;
+    padding-top: 6px;
+}
+.user-pic-small img {
+    border-radius: 50%;
+    width:48px;
+    height:auto;
+}

@@ -1,5 +1,5 @@
 #flask and database support
-from flask import Flask, render_template, request, jsonify, redirect, url_for, send_from_directory
+from flask import Flask, render_template, request, jsonify, make_response, redirect, url_for, send_from_directory
 #loading settings defined in the settings.yaml file
 from webapp.settings import app_config
 # handling of verification
@@ -179,10 +179,16 @@ def upload():
 
     ## compress picture
     picture_filename_jpg = compress_picture(picture, session_id )
+    ## Save path in database
+    print("saving path")
     save_picture(session_id, picture_filename_jpg)
-
-
-    return jsonify({'success': True}), 200
+    response_data = {
+            'success': True,
+            'url': url_for('static', filename="uploads/large-" + picture_filename_jpg)
+            }
+    response = make_response(jsonify(response_data))
+    response.status_code = 200
+    return response
 
 @app.route('/verify_status',methods=['POST', 'GET'])
 def verify_status():
@@ -312,6 +318,9 @@ def favicon():
                                 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
+#@app.route('/b/<string:user>')
+
+
 ## BY RUNNING COMMAND 'flask initdb' within app folder,  ##
 ## this creates an sql database instance                 ##
 @app.cli.command('initdb')
@@ -396,9 +405,16 @@ def preview_article(text, preview_lenght=40):
 def inject_auth():
     if current_user.is_authenticated:
         user = UserModel.query.get(current_user.user_id)
-        initials = user.fornavn[0].upper() + user.efturnavn[0].upper()
-        return {'authenticated': True, 'initials': initials}
+        if user.picture_path:
+            return {'authenticated': True, 
+                    'picture': user.picture_path}
+        else:
+            initials = user.fornavn[0].upper() + user.efturnavn[0].upper()
+            return {'authenticated': True, 
+                    'initials': initials}
     return {'authenticated': False}
+
+
 
 @app.cli.command('dbq')
 def dbq():

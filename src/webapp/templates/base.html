@@ -20,9 +20,15 @@
                     {% block header %}
                     {% endblock %}
                     {% if authenticated %}
+                        {% if picture%}
+                        <div class="user-pic-small">
+                            <img src="{{ url_for('static', filename='uploads/' + 'small-' + picture) }}"">
+                        </div>
+                        {% else %}
                     <form action="/profilur">
                         <button class="button-17" role="button">{{  initials  }}</button>
                     </form>
+                        {% endif %}
                     {% else %}
                     <div class="login-small">
                         <a href="/ritainn">

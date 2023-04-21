@@ -20,6 +20,7 @@ class artiklar(db.Model):
     skriv = db.Column(db.Text)
     picture_path = db.Column(db.String(), nullable=True)
     created_stamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
+
     verify = db.relationship("Verification", back_populates="article")    
     author = db.relationship('UserModel', back_populates='articles')
 
@@ -38,6 +39,7 @@ class UserModel(UserMixin, db.Model):
     picture_path = db.Column(db.String(), nullable=True)
     stovnur = db.Column(db.String(120), nullable=True)
     um_meg_stutt = db.Column(db.String(), nullable=True)
+    vangi = db.Column(db.String(100), nullable=True)
 
     articles = db.relationship('artiklar', back_populates='author')
     verify = db.relationship("Verification", back_populates="user")

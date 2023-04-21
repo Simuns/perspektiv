@@ -28,6 +28,7 @@ app = Flask(__name__)
 #importing webapp after initialization of app
 from webapp.verify import send_verification, verify, whitelist
 from webapp.process_picture import compress_picture, save_picture
+from webapp.user import set_vangi
 
 
 app_config = app_config()
@@ -46,8 +47,8 @@ for create_folder in folders_to_create:
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{current_dir}/database/database.db'
 # THIS SETTING MAKES DATABASE FASTER AND MORE RELIABLE
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 current_dir = os.getcwd()
-print("database location", app.config['SQLALCHEMY_DATABASE_URI'], "WD", os.getcwd())
 
 db.init_app(app)
 login.init_app(app)
@@ -124,6 +125,7 @@ def show_article(article_id):
 def skriva():
 
     if request.method == 'POST':
+
         session_id = request.form['session_id']
         fornavn = request.form['fornavn']
         efturnavn = request.form['efturnavn']
@@ -230,12 +232,16 @@ def register():
         uuid_obj = uuid.uuid4()
         user_id = uuid_obj.hex[:10]
         
+
+        vangi = set_vangi([fornavn,efturnavn], True)
+        
         user = UserModel(
             user_id = user_id,
             email=email,
             fornavn=fornavn,
             efturnavn=efturnavn,
-            telefon=telefon)
+            telefon=telefon,
+            vangi=vangi)
 
         user.set_password(password)
         db.session.add(user)
@@ -284,11 +290,12 @@ def profilur():
     return render_template('profilur.html', art=seinastu_artiklar_dict)
 
 
-@app.route('/um_meg')
+@app.route('/um_meg', methods=['POST', 'GET'])
 @login_required
 def um_meg():
     if request.method == 'POST':
-        pass
+        print(request.form)
+
     else:
         user = UserModel.query.get(current_user.user_id)
         return render_template('um_meg.html',user=user)
@@ -418,8 +425,6 @@ def inject_auth():
 
 @app.cli.command('dbq')
 def dbq():
-    
-    user = UserModel.query.filter_by(user_id=current_user.id).first()
-
+    pass
 if __name__ == "__main__":
     app.run(debug=True)

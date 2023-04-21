@@ -294,8 +294,26 @@ def profilur():
 @login_required
 def um_meg():
     if request.method == 'POST':
-        print(request.form)
+        form_data = request.form  # get the form data
 
+        for key in form_data:
+            value = form_data[key]
+            print(f"{key}: {value}")
+            if key == 'fornavn':
+                current_user.fornavn = value
+            elif key == 'efturnavn':
+                current_user.efturnavn = value
+            elif key == 'stovnur':
+                current_user.stovnur = value
+            elif key == 'telefon':
+                current_user.telefon = value
+            elif key == 'email':
+                current_user.email = value
+            elif key == 'vangi':
+                current_user.vangi = value
+            else: return 'error'
+        db.session.commit()
+        return 'Form submitted successfully!'
     else:
         user = UserModel.query.get(current_user.user_id)
         return render_template('um_meg.html',user=user)

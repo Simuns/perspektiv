@@ -306,14 +306,25 @@ def um_meg():
             elif key == 'stovnur':
                 current_user.stovnur = value
             elif key == 'telefon':
+                if app_config["verifyPhone"]:
+                    pass
+                else: 
+                    current_user.telefon = value
                 current_user.telefon = value
             elif key == 'email':
-                current_user.email = value
+                if app_config["verifyPhone"]:
+                    pass
+                else: 
+                    current_user.email = value
             elif key == 'vangi':
-                current_user.vangi = value
-            else: return 'error'
+                if set_vangi(value):
+                    current_user.vangi = value
+                else:
+                    return jsonify({'success': False, 'error': "Prøva okkurt annað, hetta er longu tykið"}), 200
+
+            else: return jsonify({'success': False, 'error': "form not found"}), 200
         db.session.commit()
-        return 'Form submitted successfully!'
+        return jsonify({'success': True}), 200
     else:
         user = UserModel.query.get(current_user.user_id)
         return render_template('um_meg.html',user=user)

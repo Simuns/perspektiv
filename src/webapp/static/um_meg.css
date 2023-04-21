@@ -42,3 +42,9 @@ span {
     display: flex;
     justify-content: space-between;
 }
+.knappar{
+    display: flex;
+}
+.closeKnappurdiv {
+    margin-left: 2%;
+}

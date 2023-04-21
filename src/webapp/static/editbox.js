@@ -49,30 +49,52 @@ function addEditDivEventListener(editDiv, isFormSubmitted) {
         closeButton.addEventListener('click', function(event) {
           event.preventDefault(); // prevent default button behavior
           editOpenDiv.replaceWith(originalEditDiv)
+          originalEditDiv = undefined;
         });
         // ADD EVENT LISTENER TO SUBMIT BUTTON AND TIE TO POST ACTION
         const editOpenForm = editOpenDiv.querySelector('form');
         const submitBtn = editOpenDiv.querySelector('.goymKnappur');
         let isFormSubmitted = false; // variable to track if the form is submitted
-        submitBtn.addEventListener('click', function(event) {
-          event.preventDefault(); // prevent default button behavior
-        
-          const formData = new FormData(editOpenForm); // create a new FormData object from the form
-        
-          // send a POST request using the fetch() API
-          fetch('/um_meg', {
-            method: 'POST',
-            body: formData
-          })
-          .then(response => response.text())
-          .then(data => {
-            console.log(data); // log the response from the server
-            isFormSubmitted = true; // set the variable to true on successful form submission
-          })
-          .catch(error => {
-            console.error(error); // log any errors that occur
+
+        //// IF SUBMIT BUTTON ACTUALLY EXSISTS, THEN ADD SUBMIT POST CONTENT LOGIC
+        if (submitBtn){
+          submitBtn.addEventListener('click', function(event) {
+            event.preventDefault(); // prevent default button behavior
+          
+            const formData = new FormData(editOpenForm); // create a new FormData object from the form
+          
+            // send a POST request using the fetch() API
+            fetch('/um_meg', {
+              method: 'POST',
+              body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+              console.log(data); // log the response from the server
+              isFormSubmitted = true; // set the variable to true on successful form submission
+
+
+              // INSERT NEW CONTENT AFTER SUCCESSFUL SUBMIT
+              fetch(`/um_meg?id=${id}`)
+              .then(response => response.text())
+              .then(data => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = data;
+                sumbittedDiv = tempDiv.querySelector(`#${id}.edit`);
+                // ADD CONTENT TO CLICKED DIV
+                editOpenDiv.replaceWith(sumbittedDiv);
+                  originalEditDiv = undefined;
+                addEditDivEventListener(sumbittedDiv);
+                });
+
+
+
+            })
+            .catch(error => {
+              console.error(error); // log any errors that occur
+            });
           });
-        });
+        }
 
         // Execute any scripts in the new content
         const scripts = editOpenDiv.getElementsByTagName("script");
@@ -112,9 +134,6 @@ function hasFormChanged(form) {
   console.log("form has not changed");
   return false;
 }
-
-
-
 
 // Loop through each "edit" div and add the click event listener
 editDivs.forEach(editDiv => {

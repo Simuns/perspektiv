@@ -1,7 +1,7 @@
 #flask and database support
 from flask import Flask, render_template, request, jsonify, make_response, redirect, url_for, send_from_directory
 #loading settings defined in the settings.yaml file
-from webapp.settings import app_config
+from webapp.settings import app_config 
 # handling of verification
 # database dependencies
 from webapp.database import db, artiklar, Verification, UserModel, login
@@ -454,6 +454,64 @@ def inject_auth():
 
 @app.cli.command('dbq')
 def dbq():
-    pass
+
+    # Generate mock database entries
+    rootdir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
+    file_path = os.path.join(rootdir, "loremipsum.txt")
+    with open(file_path, 'r') as file:
+        loremipsum = file.read().replace('\n', '')
+    print(loremipsum)
+
+#
+    fornavn = ["Micheal", "Janus", "Jónsvein", "Arnold", "Símun"]
+    efturnavn = ["Jackson","Kamban", "Joensen", "Astalavista", "Højgaard"]
+    stovnur = ["Jarðmóður","javnaðarflokkurin", "Sambandsflokkurin", "Lesandi", "Løgfrøðinur"]
+    telefon = ["126232","438303","238603","196824","143876"]
+    skriv = loremipsum
+    picture_path = ["3dcdeb74-MJ.jpg", "87457ab892-headshot.jpg", "87457ab892-headshot2.jpg", "87457ab892-arnold.jpg", "b641ab7e-simun.jpg"]
+    created_stamp = datetime.utcnow()
+    # retrieve the row to duplicate
+
+    import random
+    # create 20 duplicates of the row with new IDs
+    for i in range(20):
+
+        random_number = random.randint(0, 4)
+        new_id = 10000000 + i + 1  # generate a new ID for each duplicate
+
+
+        nytt_skriv = artiklar(
+            art_id=str(new_id),
+            fornavn=fornavn[random_number],
+            efturnavn=efturnavn[random_number],
+            stovnur=stovnur[random_number],
+            telefon=telefon[random_number],
+            picture_path=picture_path[random_number],
+            yvirskrift=f"Yvirskrift Nummar {i}",
+            skriv="<p>"+loremipsum+"</p>",
+            created_stamp = datetime.utcnow(),
+            )
+        db.session.add(nytt_skriv)
+        db.session.commit()
+        whitelist(str(new_id), "whitelist")
+    for i in range(5):
+        new_id = 1000000000 + i + 1
+        random_number = random.randint(0, 4)
+        brukari = UserModel(
+            user_id = str(new_id),
+            email=fornavn[random_number].lower()+efturnavn[random_number].lower()+"@gmail.com",
+            fornavn=fornavn[random_number],
+            efturnavn=efturnavn[random_number],
+            password_hash="pbkdf2:sha256:260000$3hjD7rW3L63l86KR$d940ec3b88828b1d40564cee66be73234a235859c1896037f3cffd5583d82425",
+            telefon=telefon[random_number],
+            stovnur=stovnur[random_number],
+            picture_path=picture_path[random_number],
+            created_stamp = datetime.utcnow(),
+            vangi = f"{fornavn[random_number].lower()}.{efturnavn[random_number].lower()}"
+        )
+        db.session.add(brukari)
+        db.session.commit()
+        whitelist(str(new_id), "whitelist")
+        
 if __name__ == "__main__":
     app.run(debug=True)

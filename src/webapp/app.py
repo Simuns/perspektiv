@@ -499,15 +499,15 @@ def dbq():
         random_number = random.randint(0, 4)
         brukari = UserModel(
             user_id = str(new_id),
-            email=fornavn[random_number].lower()+efturnavn[random_number].lower()+"@gmail.com",
-            fornavn=fornavn[random_number],
-            efturnavn=efturnavn[random_number],
+            email=fornavn[i].lower()+efturnavn[i].lower()+"@gmail.com",
+            fornavn=fornavn[i],
+            efturnavn=efturnavn[i],
             password_hash="pbkdf2:sha256:260000$3hjD7rW3L63l86KR$d940ec3b88828b1d40564cee66be73234a235859c1896037f3cffd5583d82425",
-            telefon=telefon[random_number],
-            stovnur=stovnur[random_number],
-            picture_path=picture_path[random_number],
+            telefon=telefon[i],
+            stovnur=stovnur[i],
+            picture_path=picture_path[i],
             created_stamp = datetime.utcnow(),
-            vangi = f"{fornavn[random_number].lower()}.{efturnavn[random_number].lower()}"
+            vangi = f"{fornavn[i].lower()}.{efturnavn[i].lower()}"
         )
         db.session.add(brukari)
         db.session.commit()

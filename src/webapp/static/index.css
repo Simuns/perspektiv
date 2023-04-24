@@ -54,4 +54,6 @@
 
 .artPrev-picture img {
     border-radius: 25%;
+    height: 100px;
+    width: auto;
 }

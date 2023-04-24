@@ -15,6 +15,9 @@
                                 {% if art[key]['fornavn'] %}
                                 <p>{{ art[key]['fornavn'] }} {% if art[key]['efturnavn'] %}{{ art[key]['efturnavn'] }}{% endif %}</p>
                                 {% endif %}
+                                {% if art[key]['vangi'] %}
+                                <a href="/@{{ art[key]['vangi']}}">@{{ art[key]['vangi']}}</a>
+                                {% endif %}
                                 {% if art[key]['stovnur'] %}
                                 <p>{{ art[key]['stovnur'] }}</p>
                                 {% endif %}

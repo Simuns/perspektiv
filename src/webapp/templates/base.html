@@ -21,8 +21,16 @@
                     {% endblock %}
                     {% if authenticated %}
                         {% if picture%}
-                        <div class="user-pic-small">
+                        <div class="dropdown">                            
                             <img src="{{ url_for('static', filename='uploads/' + 'small-' + picture) }}"">
+                                <div class="dropdown-content">
+                                  <a href="/profilur">Mín veggur</a>
+                                  <a href="/um_meg">Um meg</a>
+                                  <a href="/logout">Rita út</a>
+                                </div>
+                              </div>
+                              
+
                         </div>
                         {% else %}
                     <form action="/profilur">
@@ -39,6 +47,8 @@
                 </div>
             </nav>
         </header>
+        {% block banner %}
+        {% endblock %}
         <div class="main">
             <aside class="left">
                 {% block left %}

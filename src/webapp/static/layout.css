@@ -11,7 +11,7 @@ body {
     */
     text-align: left;
     color: black;
-    font-size: 24px;
+    font-size: 20px;
     display: flex;
     flex-direction: column;
 }
@@ -44,7 +44,7 @@ nav a {
     margin: 5px;
     background: #fbfdfe;
     padding: 3em 0 3em 0;
-    flex: 1.5 1 100px;
+    flex: 2 1 100px;
 }
 main{
     margin: 5px;
@@ -55,7 +55,7 @@ main{
     margin: 5px;
     background: #fbfdfe ;
     padding: 3em 0 3em 0;
-    flex: 1.5 1 100px;
+    flex: 2 1 100px;
 }
 footer {
     background: #fbfdfe;
@@ -92,7 +92,7 @@ table, th, td {
 
 
 .main-header{
-    width: 53.5%;
+    width: 49%;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;

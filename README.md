@@ -25,10 +25,10 @@ My goal was to write something beautiful with as little code as possible. Althou
 - [x] Very fancy fitting logo (thank you Matteus)
 - [x] Include login/user session logic
 - [ ] reorganize all the routes... arrghhh
-- [ ] About me settings page
-- [ ] profile link logic
+- [x] About me settings page
+- [x] profile link logic
 - [ ] personal profile page
-- [ ] public profile page
+- [x] public profile page
 - [ ] edit/delete articles feature
 - [ ] search function on front page
 - [ ] agree/disagree on articles (Really need to rethink how this should work, could be a dangerous part of the website, need to be careful)

@@ -361,11 +361,14 @@ def favicon():
 @app.route('/@<string:vangi>')
 def brukari(vangi):
     user = UserModel.query.filter(UserModel.vangi == vangi).join(Verification).filter(Verification.status == 'verified').first()
+    user_owner = False
     if user:
+        if current_user.is_authenticated:
+            if current_user.user_id == user.user_id:
+                user_owner = True
         article_count = artiklar.query.filter(artiklar.telefon == user.telefon).join(Verification).filter(Verification.status == 'verified').count()
         if article_count == 0:
-            session_id = str(uuid.uuid4())[:8]
-            return render_template('skriva.html', session_id=session_id)
+            return render_template('brukari.html', art=False, user=user)
         seinastu_artiklar_dbRaw = artiklar.query.filter(artiklar.telefon == user.telefon).join(Verification).filter(Verification.status == 'verified').order_by(artiklar.created_stamp.desc()).limit(10).all()
         seinastu_artiklar_dict = latest_articles_dict(seinastu_artiklar_dbRaw)
         for article in seinastu_artiklar_dict:
@@ -374,8 +377,7 @@ def brukari(vangi):
 
             preview_text = preview_article(seinastu_artiklar_dict[article]["skriv"])
             seinastu_artiklar_dict[article]["preview_text"] = preview_text
-
-        return render_template('brukari.html',art=seinastu_artiklar_dict, user=user)
+        return render_template('brukari.html',art=seinastu_artiklar_dict, user=user, user_owner=user_owner)
     else:
         return render_template('error.html', error=f'{vangi} finst ikki')
 

@@ -22,6 +22,7 @@
             <div class="art-names">
                 {% if art_dict['fornavn'] %}
                 <p>{{ art_dict['fornavn'] }} {% if art_dict['efturnavn'] %}{{ art_dict['efturnavn'] }}{% endif %}</p>
+                <a href="/@{{ art_dict['vangi']}}">@{{ art_dict['vangi']}}</a>
                 {% endif %}
                 {% if art_dict['stovnur'] %}
                 <p>{{ art_dict['stovnur'] }}</p>

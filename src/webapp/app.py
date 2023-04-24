@@ -74,6 +74,10 @@ def index():
     seinastu_artiklar_dbRaw = artiklar.query.join(Verification).filter(Verification.status == 'verified').order_by(artiklar.created_stamp.desc()).limit(10).all()
     seinastu_artiklar_dict = latest_articles_dict(seinastu_artiklar_dbRaw)
     for article in seinastu_artiklar_dict:
+        user = UserModel.query.join(artiklar).filter(UserModel.telefon == seinastu_artiklar_dict[article]['telefon']).first()
+
+        if user:
+            seinastu_artiklar_dict[article]["vangi"] = user.vangi
         time_delta = timeDelta(seinastu_artiklar_dict[article]["created_stamp"])
         seinastu_artiklar_dict[article]["time_delta"] = time_delta
 
@@ -287,7 +291,7 @@ def profilur():
             seinastu_artiklar_dict[article]["created_stamp"] = seinastu_artiklar_dict[article]["created_stamp"].strftime('%Y-%m-%d')
 
 
-    return render_template('profilur.html', art=seinastu_artiklar_dict)
+        return render_template('profilur.html', art=seinastu_artiklar_dict)
 
 
 @app.route('/um_meg', methods=['POST', 'GET'])
@@ -354,9 +358,29 @@ def favicon():
                                 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
-#@app.route('/b/<string:user>')
+@app.route('/@<string:vangi>')
+def brukari(vangi):
+    user = UserModel.query.filter(UserModel.vangi == vangi).join(Verification).filter(Verification.status == 'verified').first()
+    if user:
+        article_count = artiklar.query.filter(artiklar.telefon == user.telefon).join(Verification).filter(Verification.status == 'verified').count()
+        if article_count == 0:
+            session_id = str(uuid.uuid4())[:8]
+            return render_template('skriva.html', session_id=session_id)
+        seinastu_artiklar_dbRaw = artiklar.query.filter(artiklar.telefon == user.telefon).join(Verification).filter(Verification.status == 'verified').order_by(artiklar.created_stamp.desc()).limit(10).all()
+        seinastu_artiklar_dict = latest_articles_dict(seinastu_artiklar_dbRaw)
+        for article in seinastu_artiklar_dict:
+            time_delta = timeDelta(seinastu_artiklar_dict[article]["created_stamp"])
+            seinastu_artiklar_dict[article]["time_delta"] = time_delta
+
+            preview_text = preview_article(seinastu_artiklar_dict[article]["skriv"])
+            seinastu_artiklar_dict[article]["preview_text"] = preview_text
+
+        return render_template('brukari.html',art=seinastu_artiklar_dict, user=user)
+    else:
+        return render_template('error.html', error=f'{vangi} finst ikki')
 
 
+        return render_template('brukari.html')
 ## BY RUNNING COMMAND 'flask initdb' within app folder,  ##
 ## this creates an sql database instance                 ##
 @app.cli.command('initdb')
@@ -451,9 +475,17 @@ def inject_auth():
     return {'authenticated': False}
 
 
+@app.cli.command('test')
+def test():
+    vangi = "simun.hojgaard"
+    user = UserModel.query.filter(UserModel.vangi== vangi).join(Verification).filter(Verification.status == 'verified').first()
+    seinastu_artiklar_dbRaw = artiklar.query.join(Verification).filter(Verification.status == 'verified').join(artiklar.author).filter_by(telefon=user.telefon).all()
+    #seinastu_artiklar_dbRaw = artiklar.query.filter(artiklar.telefon == user.telefon).join(Verification).filter(Verification.status == 'verified').order_by(artiklar.created_stamp.desc()).limit(10).all()
+    print(rowToDict(user))
+    print(latest_articles_dict( seinastu_artiklar_dbRaw))
 
-@app.cli.command('dbq')
-def dbq():
+@app.cli.command('cmdb')
+def cmdb():
 
     # Generate mock database entries
     rootdir = os.path.abspath(os.path.join(os.getcwd(), "../.."))
@@ -469,7 +501,6 @@ def dbq():
     telefon = ["126232","438303","238603","196824","143876"]
     skriv = loremipsum
     picture_path = ["3dcdeb74-MJ.jpg", "87457ab892-headshot.jpg", "87457ab892-headshot2.jpg", "87457ab892-arnold.jpg", "b641ab7e-simun.jpg"]
-    created_stamp = datetime.utcnow()
     # retrieve the row to duplicate
 
     import random

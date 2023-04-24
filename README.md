@@ -1,4 +1,4 @@
-![frontpage](.gitcontent/frontpage.png)
+![profile](.gitcontent/profile.png)
 
 # 
 This project was a way for me to learn how webdevelopment works. It allowed me to experiment with:
@@ -34,6 +34,8 @@ My goal was to write something beautiful with as little code as possible. Althou
 - [ ] agree/disagree on articles (Really need to rethink how this should work, could be a dangerous part of the website, need to be careful)
 - [ ] reply to artilce 
 - [ ] comment on article (yeah about this,,,, also contriversial)
+
+![frontpage](.gitcontent/frontpage.png)
 
 # installation guides
 ## Install via docker

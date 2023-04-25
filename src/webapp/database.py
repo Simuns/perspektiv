@@ -24,6 +24,14 @@ class artiklar(db.Model):
     verify = db.relationship("Verification", back_populates="article")    
     author = db.relationship('UserModel', back_populates='articles')
 
+class Brellbitar(db.Model):
+    brell_id = db.Column(db.String(9), primary_key=True)
+    user_id = db.Column(db.String(10), db.ForeignKey('users.user_id'), nullable=True)
+    tekstur = db.Column(db.Text)
+    created_stamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
+    poeng = (db.Integer)
+    author = db.relationship('UserModel', back_populates='brellbitar')
+
 
 ## DEFINE USER TABLE
 class UserModel(UserMixin, db.Model):
@@ -42,7 +50,9 @@ class UserModel(UserMixin, db.Model):
     vangi = db.Column(db.String(100), nullable=True)
 
     articles = db.relationship('artiklar', back_populates='author')
+    brellbitar = db.relationship('Brellbitar', back_populates='author')
     verify = db.relationship("Verification", back_populates="user")
+
 
     def get_id(self):
         return self.user_id

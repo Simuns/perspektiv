@@ -7,6 +7,7 @@
     background-image: linear-gradient(to right top, #ffffff, #e6e9ff, #c1d7ff, #8cc7ff, #22bafc);}
 
 .brukari{
+    font-family: Tahoma, sans-serif;
     position: relative;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     background-color: rgb(57, 62, 63);
@@ -88,4 +89,24 @@
 .fylgir{
     margin-left: 10px;
     flex:1;
+}
+
+.post{
+    margin-top: 20px;
+    width: 100%;
+    position: relative;
+    height: 100px;
+}
+
+.post img {
+    height: 100px;
+    position: absolute;
+    left: 50%;
+    margin-left: -50px; /* half of the image width */
+}
+.post img:hover{
+    background-color: #22bafc;
+    border-radius: 100%;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    cursor: pointer;
 }

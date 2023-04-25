@@ -219,7 +219,7 @@ def aktivera(code_email):
 @app.route('/register', methods=['POST', 'GET'])
 def register():
     if current_user.is_authenticated:
-        return redirect('/profilur')
+        return redirect(f'/@{current_user.vangi}')
 
     if request.method == 'POST':
         email = request.form['email']
@@ -256,7 +256,7 @@ def register():
             return render_template('verify.html', session_id=user_id, telefon=telefon)
         else: 
             whitelist(user_id)
-            return render_template('ritainn.html')
+            return redirect(url_for('login'))
     else:
         return render_template('register.html')
 
@@ -269,7 +269,7 @@ def login():
         user = UserModel.query.filter_by(email = email).first()
         if user is not None and user.check_password(request.form['password']):
             login_user(user)
-            return redirect('/profilur')
+            return redirect('/')
     return render_template('ritainn.html')
 
 @app.route('/logout')

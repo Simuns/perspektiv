@@ -469,11 +469,15 @@ def inject_auth():
         user = UserModel.query.get(current_user.user_id)
         if user.picture_path:
             return {'authenticated': True, 
-                    'picture': user.picture_path}
+                    'picture': user.picture_path,
+                    'fornavn': user.fornavn,
+                    'vangi': user.vangi}
         else:
             initials = user.fornavn[0].upper() + user.efturnavn[0].upper()
             return {'authenticated': True, 
-                    'initials': initials}
+                    'initials': initials,
+                    'fornavn': user.fornavn,
+                    'vangi': user.vangi}
     return {'authenticated': False}
 
 

@@ -253,28 +253,43 @@ table, th, td {
     padding-top: 6px;*/
     position: relative;
     display: inline-block;
+    width: 200px;
+    border-radius: 48px;
+    height: 48px;
+    background-color: rgb(57, 62, 63);
+    color: white;
 }
-.dropdown img {
+.dropdown-picture {
     border-radius: 50%;
-    width:48px;
-    height:auto;
+    width:auto;
+    height:100%;
 }
+
+.dropdown-fornavn{
+    position: absolute;
+    left:41%;
+    top: 22%;
+    margin: 0;
+}
+
 .dropdown:hover{
-    width:200px;
-    background-color: white;
-    border-top-left-radius: 40px;
-    border-top-right-radius: 40px;
+    border-top-right-radius: 24px;
+    border-top-left-radius: 24px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
 }
+
 .dropdown-content {
   display: none;
   position: absolute;
   z-index: 1;
   width: 200px;
+  margin-top: -9px;
 
 }
 .dropdown:hover .dropdown-content {
   display: block;
-  
+
 }
 
 .dropdown-content a {
@@ -286,6 +301,10 @@ table, th, td {
   
 }
 .dropdown-content a:hover {
+    
   background-color: #f1f1f1;
 }
-
+.dropdown-lastlink{
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+}

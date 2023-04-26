@@ -1,0 +1,68 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-velPost {
+    background-color: rgb(57, 62, 63);
+    width: calc(48%); /* subtract 20 pixels of padding on each side */
+    height: 500px ; /* subtract 20 pixels of padding on each side */
+    padding: 20px; /* add padding to the inside of the div */
+    /*border: 1px solid black;*/
+    border-radius: 25px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+
+}
+
+.vel-header {
+  width: 100%;
+  height: calc(100% / 2);
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+.vel-header h1{
+  font-family: Tahoma, sans-serif;
+  text-align: center
+}
+
+.vel-lesarabræv,
+.vel-brell {
+  width: calc(40%);
+  height: calc(90% / 2);
+  background-color: #22BAFC;
+  border-radius: 20px;
+  margin: 15px;
+  opacity: 75%;
+  margin-bottom:  20px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  cursor: pointer;
+}
+
+.vel-brell p,
+.vel-lesarabræv p{
+  opacity: 100%;
+  font-weight: bold;
+  font-family: Tahoma, sans-serif;
+}
+
+.vel-lesarabræv:hover,
+.vel-brell:hover{
+  opacity: 100%;
+}

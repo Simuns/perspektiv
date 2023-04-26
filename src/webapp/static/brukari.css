@@ -54,6 +54,7 @@
 }
 
 .fylg-knappur {
+    cursor: pointer;
     position: absolute;
     left: 70%;
     top: 0;
@@ -103,9 +104,11 @@
     position: absolute;
     left: 50%;
     margin-left: -50px; /* half of the image width */
+    opacity: 70%;
+    border-radius: 100%;
 }
 .post img:hover{
-    background-color: #22bafc;
+    background-color: rgba(34, 186, 252, 0.85);
     border-radius: 100%;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     cursor: pointer;

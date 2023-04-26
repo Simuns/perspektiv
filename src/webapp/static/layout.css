@@ -249,9 +249,6 @@ table, th, td {
 }
 
 .dropdown{
-    
-    /*padding-left: 10px;
-    padding-top: 6px;*/
     position: relative;
     display: inline-block;
     width: 200px;
@@ -271,6 +268,7 @@ table, th, td {
     left:41%;
     top: 22%;
     margin: 0;
+    font-family: Tahoma, sans-serif;
 }
 
 .dropdown:hover{

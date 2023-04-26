@@ -64,7 +64,9 @@
     </div>
 </div>
 {% if user_owner %}
-<p></p>
+<div class="post">
+    <img src="{{ url_for('static', filename='pluss.png')}}"></img>
+</div>
 {% endif %}
 {% if art %}
 {% include "base-prev.html" %}

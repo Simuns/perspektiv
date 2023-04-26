@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, jsonify, make_response, redir
 from webapp.settings import app_config 
 # handling of verification
 # database dependencies
-from webapp.database import db, artiklar, Verification, UserModel, login
+from webapp.database import db, artiklar, Verification, UserModel, login, Brellbitar
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc, text
 
@@ -124,6 +124,42 @@ def show_article(article_id):
     date_string = art_dict["created_stamp"].strftime('%Y-%m-%d')
     art_dict["date_string"] = date_string
     return render_template('article.html',art_dict=art_dict)
+
+
+@app.route('/vel-postform')
+def vel_postform():
+    return render_template('vel-postform.html')
+
+@app.route('/post-art', methods=['POST', 'GET'])
+def postArt():
+    if request.method == 'POST':
+        session_id = str(uuid.uuid4())[:8]
+        text = request.form['text']
+        user_id = request.form['user_id']
+        art = artiklar.query.filter_by(art_id=session_id).first()
+
+
+@app.route('/post-brell', methods=['POST', 'GET'])
+def PostBrell():
+    if request.method == 'POST':
+        uuid_obj = uuid.uuid4()
+        brell_id = uuid_obj.hex[:9]
+        text = db.Column(db.Text)
+        user_id = current_user.user_id
+        nytt_brell = Brellbitar(
+                brell_id=brell_id,
+                text=text,
+                user_id = user_id,
+                )
+        db.session.add(nytt_brell)
+        db.session.commit()
+
+        return jsonify({'success': True}), 200
+    else:
+        render_template('post-brell.html')
+
+
+
 
 @app.route('/skriva', methods=['POST', 'GET'])
 def skriva():
@@ -275,7 +311,7 @@ def login():
 @app.route('/logout')
 def logout():
     logout_user()
-    return redirect('/profilur')
+    return redirect('/')
 
 @app.route('/profilur')
 @login_required

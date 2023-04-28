@@ -27,9 +27,9 @@ class artiklar(db.Model):
 class Brellbitar(db.Model):
     brell_id = db.Column(db.String(9), primary_key=True)
     user_id = db.Column(db.String(10), db.ForeignKey('users.user_id'), nullable=True)
-    tekstur = db.Column(db.Text)
+    text = db.Column(db.Text)
     created_stamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
-    poeng = (db.Integer)
+    poeng = db.Column(db.Integer, nullable=True)
     author = db.relationship('UserModel', back_populates='brellbitar')
 
 

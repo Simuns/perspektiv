@@ -139,24 +139,27 @@ def postArt():
         art = artiklar.query.filter_by(art_id=session_id).first()
 
 
-@app.route('/post-brell', methods=['POST', 'GET'])
+@app.route('/post-stubbi', methods=['POST', 'GET'])
+@login_required
 def PostBrell():
     if request.method == 'POST':
-        uuid_obj = uuid.uuid4()
+        uuid_obj = uuid.uuid1()
         brell_id = uuid_obj.hex[:9]
-        text = db.Column(db.Text)
-        user_id = current_user.user_id
+        request_data = request.get_json()
+        text = request_data.get('text')
+        print("tekstur", text)
+        print(current_user.user_id)
+        print(brell_id)
         nytt_brell = Brellbitar(
                 brell_id=brell_id,
                 text=text,
-                user_id = user_id,
-                )
+                user_id = current_user.user_id)
+        
         db.session.add(nytt_brell)
         db.session.commit()
-
         return jsonify({'success': True}), 200
     else:
-        render_template('post-brell.html')
+        return render_template('post-stubbi.html')
 
 
 
@@ -404,7 +407,7 @@ def brukari(vangi):
                 user_owner = True
         article_count = artiklar.query.filter(artiklar.telefon == user.telefon).join(Verification).filter(Verification.status == 'verified').count()
         if article_count == 0:
-            return render_template('brukari.html', art=False, user=user)
+            return render_template('brukari.html', art=False, user=user, user_owner=user_owner)
         seinastu_artiklar_dbRaw = artiklar.query.filter(artiklar.telefon == user.telefon).join(Verification).filter(Verification.status == 'verified').order_by(artiklar.created_stamp.desc()).limit(10).all()
         seinastu_artiklar_dict = latest_articles_dict(seinastu_artiklar_dbRaw)
         for article in seinastu_artiklar_dict:
@@ -537,7 +540,7 @@ def cmdb():
     print(loremipsum)
 
 #
-    fornavn = ["Micheal", "Janus", "Jónsvein", "Arnold", "Símun"]
+    fornavn = ["Micheal", "Janus", "Jónsvein", "Arnold", "Dánjal"]
     efturnavn = ["Jackson","Kamban", "Joensen", "Astalavista", "Højgaard"]
     stovnur = ["Jarðmóður","javnaðarflokkurin", "Sambandsflokkurin", "Lesandi", "Løgfrøðinur"]
     telefon = ["126232","438303","238603","196824","143876"]
@@ -569,7 +572,6 @@ def cmdb():
         whitelist(str(new_id), "whitelist")
     for i in range(5):
         new_id = 1000000000 + i + 1
-        random_number = random.randint(0, 4)
         brukari = UserModel(
             user_id = str(new_id),
             email=fornavn[i].lower()+efturnavn[i].lower()+"@gmail.com",

@@ -130,14 +130,15 @@ def show_article(article_id):
 def vel_postform():
     return render_template('vel-postform.html')
 
-@app.route('/post-art', methods=['POST', 'GET'])
+@app.route('/post-grein', methods=['POST', 'GET'])
 def postArt():
     if request.method == 'POST':
         session_id = str(uuid.uuid4())[:8]
         text = request.form['text']
         user_id = request.form['user_id']
         art = artiklar.query.filter_by(art_id=session_id).first()
-
+    else:
+        return render_template('post-grein.html')
 
 @app.route('/post-stubbi', methods=['POST', 'GET'])
 @login_required

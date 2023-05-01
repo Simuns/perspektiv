@@ -15,6 +15,8 @@ function activate_postform() {
       } else if (postChoiseDiv.id === 'grein') {
         // DECLARE POST TYPE AS GREIN
         postType = "grein"
+
+
       }
       const response = await fetch('/post-' + postType);
       const html = await response.text();
@@ -41,29 +43,10 @@ function activate_postform() {
       script.src = '/static/areYouSure.js'; // replace with the path to your script file
       document.head.appendChild(script);
 
+      // RUN CHARACTER COUNT IF WRITING STUBBI
+      if (postType === "stubbi") {
+        charCount();}
 
-      // Character count
-      const textarea = document.getElementById('stubbiTextArea');
-      const charCount = document.getElementById('charCount');
-
-      const maxLength = 365;
-      
-      textarea.addEventListener('input', () => {
-        const remainingChars = maxLength - textarea.value.length;
-        charCount.innerHTML = `${remainingChars}`;
-
-        if (remainingChars <= 20) {
-          charCount.style.color = 'red';
-          charCount.innerHTML = `${remainingChars}`;} 
-          else {
-          charCount.style.color = 'black';
-        }
-        if (remainingChars < 365) {
-          userContentWritten = true;
-        } else {
-          userContentWritten = false;
-        }
-      });
       const backButton = document.querySelector('.post-exit')
       backButton.addEventListener('click', (event) => {
         const replaceThis = document.querySelector('.postFormContainer')
@@ -80,43 +63,60 @@ function activate_postform() {
           activate_postform();
         }
       });
-      //ADD SUBMIT ACTION
-      const postButton = document.querySelector('.postButton')
-      postButton.addEventListener('click', (event) => {
-        if (userContentWritten) {
-          
-          const textareaElement = document.getElementById('stubbiTextArea');
-          const textareaValue = textareaElement.value;
-  
-          const data = { text: textareaValue };
-  
-          fetch('/post-stubbi', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-          })
-          .then(response => response.json())
-          .then(data => {
-            console.log(data); // log the response from the server
-            if (data.success) {
-  
-              // handle the case where success is true
-              console.log('Post was successful');
-              if (addPostOverlay) {
-                document.body.removeChild(addPostOverlay);
-              }
-            } else {
-              // handle the case where success is false
-              console.log(data.error);
-            }
-          })
-          .catch(error => console.error(error));
-        }
-      });
+      //ADD SUBMIT ACTION TO POST, HANDLE DIFFERENTLY DEPENDING ON TYPE OF POST
+      postButton = document.querySelector('.postButton')
+      if (postButton.id === 'stubbi') {
+        const script = document.createElement('script');
+        script.src = '/static/post-stubbi.js'; // replace with the path to your script file
+        document.head.appendChild(script);}
+      else if (postButton.id === 'grein') {
+        const script = document.createElement('script');
+        script.src = '/static/post-grein.js'; // replace with the path to your script file
+        document.head.appendChild(script);
+      }
     });
   });
 }
 activate_postform();
 
+
+// ONLY USED FOR STUBBI
+function charCount() {
+  const textarea = document.getElementById('stubbiTextArea');
+  const charCount = document.getElementById('charCount');
+  const maxLength = 365;
+  
+  textarea.addEventListener('input', () => {
+    const remainingChars = maxLength - textarea.value.length;
+    const remainingPercentage = (remainingChars / maxLength) * 100;
+    charCount.innerHTML = `${remainingChars}`;
+
+    if (remainingPercentage >= 100) {
+      stubbiTextArea.style.fontSize = '3rem';} // add font size adjustment
+    else if (remainingPercentage > 95) {
+      stubbiTextArea.style.fontSize = '2.5rem';}
+    else if (remainingPercentage > 85) {
+      stubbiTextArea.style.fontSize = '2.2rem';}
+    else if (remainingPercentage > 75) {
+      stubbiTextArea.style.fontSize = '2.0rem';}
+    else if (remainingPercentage > 65) {
+      stubbiTextArea.style.fontSize = '1.8rem';}
+    else if (remainingPercentage > 55) {
+      stubbiTextArea.style.fontSize = '1.5rem';}
+      else {
+      stubbiTextArea.style.fontSize = '1.3rem';}
+
+    if (remainingChars <= 20) {
+      charCount.style.color = 'red';
+      charCount.innerHTML = `${remainingChars}`;
+    } else {
+      charCount.style.color = 'black';
+    }
+
+    if (remainingChars < 365) {
+      userContentWritten = true;
+    } else {
+      userContentWritten = false;
+    }
+  });
+}

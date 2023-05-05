@@ -1,4 +1,5 @@
 let addPostOverlay;
+let userContentWritten;
 // get the div with class "post"
 const postDiv = document.querySelector('.post img');
 

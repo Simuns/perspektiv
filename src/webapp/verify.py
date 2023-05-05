@@ -2,7 +2,7 @@ import sendgrid
 from sendgrid.helpers.mail import Mail, Email, To, Content
 import random
 from webapp.settings import app_config
-from webapp.database import db, artiklar,UserModel, Verification
+from webapp.database import db, Grein, UserModel, Verification
 from webapp.app import app
 import uuid
 from datetime import datetime

@@ -10,27 +10,24 @@ from flask_login import UserMixin
 db = SQLAlchemy()
 
 ## DEFINE ARTILCE TABLE ##
-class artiklar(db.Model):
-    art_id = db.Column(db.String(8), primary_key=True)
-    fornavn = db.Column(db.String(50), nullable=True)
-    efturnavn = db.Column(db.String(50), nullable=True)
-    stovnur = db.Column(db.String(120), nullable=True)
-    telefon = db.Column(db.String(6), db.ForeignKey('users.telefon'), nullable=True)
+class Grein(db.Model):
+    grein_id = db.Column(db.String(8), primary_key=True)
     yvirskrift = db.Column(db.String(120), nullable=True)
-    skriv = db.Column(db.Text)
-    picture_path = db.Column(db.String(), nullable=True)
+    grein = db.Column(db.Text)
     created_stamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
 
-    verify = db.relationship("Verification", back_populates="article")    
+    verify = db.relationship("Verification", back_populates="article")
+
+    author_id = db.Column(db.String(10), db.ForeignKey('users.user_id'), nullable=False)
     author = db.relationship('UserModel', back_populates='articles')
 
-class Brellbitar(db.Model):
-    brell_id = db.Column(db.String(9), primary_key=True)
-    user_id = db.Column(db.String(10), db.ForeignKey('users.user_id'), nullable=True)
-    text = db.Column(db.Text)
+class Stubbi(db.Model):
+    stubbi_id = db.Column(db.String(9), primary_key=True)
+    stubbi = db.Column(db.Text)
     created_stamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
-    poeng = db.Column(db.Integer, nullable=True)
-    author = db.relationship('UserModel', back_populates='brellbitar')
+
+    author_id = db.Column(db.String(10), db.ForeignKey('users.user_id'), nullable=False)
+    author = db.relationship('UserModel', back_populates='stubbar')
 
 
 ## DEFINE USER TABLE
@@ -49,8 +46,8 @@ class UserModel(UserMixin, db.Model):
     um_meg_stutt = db.Column(db.String(), nullable=True)
     vangi = db.Column(db.String(100), nullable=True)
 
-    articles = db.relationship('artiklar', back_populates='author')
-    brellbitar = db.relationship('Brellbitar', back_populates='author')
+    articles = db.relationship('Grein', back_populates='author')
+    stubbar = db.relationship('Stubbi', back_populates='author')
     verify = db.relationship("Verification", back_populates="user")
 
 
@@ -74,10 +71,10 @@ class Verification(db.Model):
     verified_stamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
 
     user_id = db.Column(db.String, db.ForeignKey('users.user_id'), nullable=True)
-    article_id = db.Column(db.String, db.ForeignKey('artiklar.art_id'), nullable=True)
+    article_id = db.Column(db.String, db.ForeignKey('grein.grein_id'), nullable=True)
     
     user = db.relationship("UserModel", back_populates="verify")
-    article = db.relationship("artiklar", back_populates="verify")
+    article = db.relationship("Grein", back_populates="verify")
 
 
 from flask_login import LoginManager

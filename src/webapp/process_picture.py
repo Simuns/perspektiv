@@ -1,7 +1,7 @@
 import os
 # Used for picture reduction in size
 from PIL import Image
-from webapp.database import db, artiklar,UserModel
+from webapp.database import db, Grein,UserModel
 from webapp.app import app
 
 def compress_picture(picture, context_id):

@@ -4,10 +4,11 @@ from flask import Flask, render_template, request, jsonify, make_response, redir
 from webapp.settings import app_config 
 # handling of verification
 # database dependencies
-from webapp.database import db, artiklar, Verification, UserModel, login, Brellbitar
+from webapp.database import db, Grein, Verification, UserModel, login, Stubbi
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import exc, text
-
+# Used to handle quill editor data, which for some reason doesnt work with request.json
+import json
 #image commpression
 
 # Used for creating id's for articles
@@ -29,11 +30,13 @@ app = Flask(__name__)
 from webapp.verify import send_verification, verify, whitelist
 from webapp.process_picture import compress_picture, save_picture
 from webapp.user import set_vangi
+from webapp.serve_content import serve_grein, serve_stubbi
 
 
 app_config = app_config()
 # THE SECRET IS USED FOR CREATING CLIENT SESSIONS AND ENCRYPTING THEM
 app.secret_key = app_config['secret_key']
+app.config['WTF_CSRF_ENABLED'] = True
 # Get the current working directory
 current_dir = os.getcwd()
 
@@ -67,24 +70,8 @@ with app.app_context():
 
 @app.route('/')
 def index():
-    article_count = artiklar.query.count()
-    if article_count == 0:
-        session_id = str(uuid.uuid4())[:8]
-        return render_template('skriva.html', session_id=session_id)
-    seinastu_artiklar_dbRaw = artiklar.query.join(Verification).filter(Verification.status == 'verified').order_by(artiklar.created_stamp.desc()).limit(10).all()
-    seinastu_artiklar_dict = latest_articles_dict(seinastu_artiklar_dbRaw)
-    for article in seinastu_artiklar_dict:
-        user = UserModel.query.join(artiklar).filter(UserModel.telefon == seinastu_artiklar_dict[article]['telefon']).first()
-
-        if user:
-            seinastu_artiklar_dict[article]["vangi"] = user.vangi
-        time_delta = timeDelta(seinastu_artiklar_dict[article]["created_stamp"])
-        seinastu_artiklar_dict[article]["time_delta"] = time_delta
-
-        preview_text = preview_article(seinastu_artiklar_dict[article]["skriv"])
-        seinastu_artiklar_dict[article]["preview_text"] = preview_text
-
-    return render_template('index.html',art=seinastu_artiklar_dict)
+    art = serve_grein(Grein.query.order_by(Grein.created_stamp.desc()).limit(10).all())
+    return render_template('index.html',art=art)
 
 @app.route('/index_loadMore', methods=['POST', 'GET'])
 def index_loadMore():
@@ -131,88 +118,48 @@ def vel_postform():
     return render_template('vel-postform.html')
 
 @app.route('/post-grein', methods=['POST', 'GET'])
-def postArt():
+@login_required
+def postGrein():
     if request.method == 'POST':
-        session_id = str(uuid.uuid4())[:8]
-        text = request.form['text']
-        user_id = request.form['user_id']
-        art = artiklar.query.filter_by(art_id=session_id).first()
+        grein_id = str(uuid.uuid4())[:8]
+        json_postdata = request.form.get('contents')
+        data = json.loads(json_postdata)
+        grein = data['ops'][0]['insert']
+        nyggj_grein = Grein(
+            grein_id=grein_id,
+            yvirskrift="Manglar Yvirskrift",
+            grein=grein,
+            author_id=current_user.user_id,
+        )
+        whitelist(grein_id)
+        db.session.add(nyggj_grein)
+        db.session.commit()
+        return jsonify({'success': True}), 200        
     else:
         return render_template('post-grein.html')
 
 @app.route('/post-stubbi', methods=['POST', 'GET'])
 @login_required
-def PostBrell():
+def PostStubbi():
     if request.method == 'POST':
         uuid_obj = uuid.uuid1()
-        brell_id = uuid_obj.hex[:9]
+        stubbi_id = uuid_obj.hex[:9]
         request_data = request.get_json()
-        text = request_data.get('text')
+        stubbi = request_data.get('text')
         print("tekstur", text)
         print(current_user.user_id)
-        print(brell_id)
-        nytt_brell = Brellbitar(
-                brell_id=brell_id,
-                text=text,
-                user_id = current_user.user_id)
+        print(stubbi_id)
+        nyggjur_stubbi = Stubbi(
+                stubbi_id=stubbi_id,
+                stubbi=stubbi,
+                author_id=current_user.user_id)
         
-        db.session.add(nytt_brell)
+        db.session.add(nyggjur_stubbi)
         db.session.commit()
         return jsonify({'success': True}), 200
     else:
         return render_template('post-stubbi.html')
 
-
-
-
-@app.route('/skriva', methods=['POST', 'GET'])
-def skriva():
-
-    if request.method == 'POST':
-
-        session_id = request.form['session_id']
-        fornavn = request.form['fornavn']
-        efturnavn = request.form['efturnavn']
-        stovnur = request.form['stovnur']
-        telefon = request.form['telefon']
-        yvirskrift = request.form['yvirskrift']
-        quill_data = request.form.get('text')
-        print(request.form.get('text'))
-        art = artiklar.query.filter_by(art_id=session_id).first()
-        if art:
-            print("USER FOUND WITH SESSION ID:",session_id,"updating user")
-            art.fornavn=fornavn
-            art.efturnavn=efturnavn
-            art.stovnur=stovnur
-            art.telefon=telefon
-            art.yvirskrift=yvirskrift
-            art.skriv=quill_data
-            art.created_stamp = datetime.utcnow()
-
-        else:
-            print("NO USER FOUND WITH USER ID",session_id)
-            nytt_skriv = artiklar(
-                art_id=session_id,
-                fornavn=fornavn,
-                efturnavn=efturnavn,
-                stovnur=stovnur,
-                telefon=telefon,
-                yvirskrift=yvirskrift,
-                skriv=quill_data,
-                created_stamp = datetime.utcnow(),
-                )
-
-            db.session.add(nytt_skriv)
-        db.session.commit()
-
-        if app_config["verifyPhone"]:
-            send_verification(session_id, "article", "sms", telefon)
-            return render_template('verify.html', session_id=session_id, telefon=telefon)
-        else:
-            whitelist(session_id)
-            return redirect(url_for('index'))
-    session_id = str(uuid.uuid4())[:8]
-    return render_template('skriva.html', session_id=session_id)
 
 @app.route('/upload', methods=['POST'])
 def upload():
@@ -317,21 +264,6 @@ def logout():
     logout_user()
     return redirect('/')
 
-@app.route('/profilur')
-@login_required
-def profilur():
-
-    user = UserModel.query.filter_by(user_id=current_user.user_id).first()
-    seinastu_artiklar_dbRaw = artiklar.query.join(Verification).filter(Verification.status == 'verified').join(artiklar.author).filter_by(telefon=user.telefon).all()
-    if len(seinastu_artiklar_dbRaw) == 0:
-        seinastu_artiklar_dict = False
-    else:
-        seinastu_artiklar_dict = latest_articles_dict(seinastu_artiklar_dbRaw)
-        for article in seinastu_artiklar_dict:
-            seinastu_artiklar_dict[article]["created_stamp"] = seinastu_artiklar_dict[article]["created_stamp"].strftime('%Y-%m-%d')
-
-
-        return render_template('profilur.html', art=seinastu_artiklar_dict)
 
 
 @app.route('/um_meg', methods=['POST', 'GET'])
@@ -406,18 +338,13 @@ def brukari(vangi):
         if current_user.is_authenticated:
             if current_user.user_id == user.user_id:
                 user_owner = True
-        article_count = artiklar.query.filter(artiklar.telefon == user.telefon).join(Verification).filter(Verification.status == 'verified').count()
+        article_count = Grein.query.join(UserModel).filter(UserModel.user_id == Grein.author_id).order_by(Grein.created_stamp.desc()).count()
         if article_count == 0:
             return render_template('brukari.html', art=False, user=user, user_owner=user_owner)
-        seinastu_artiklar_dbRaw = artiklar.query.filter(artiklar.telefon == user.telefon).join(Verification).filter(Verification.status == 'verified').order_by(artiklar.created_stamp.desc()).limit(10).all()
-        seinastu_artiklar_dict = latest_articles_dict(seinastu_artiklar_dbRaw)
-        for article in seinastu_artiklar_dict:
-            time_delta = timeDelta(seinastu_artiklar_dict[article]["created_stamp"])
-            seinastu_artiklar_dict[article]["time_delta"] = time_delta
-
-            preview_text = preview_article(seinastu_artiklar_dict[article]["skriv"])
-            seinastu_artiklar_dict[article]["preview_text"] = preview_text
-        return render_template('brukari.html',art=seinastu_artiklar_dict, user=user, user_owner=user_owner)
+        art = serve_grein(Grein.query.join(UserModel).filter(user.user_id == Grein.author_id).order_by(Grein.created_stamp.desc()).all())
+        stubbi = serve_stubbi(Stubbi.query.join(UserModel).filter(user.user_id == Stubbi.author_id).order_by(Stubbi.created_stamp.desc()).all())
+        content= {**art, **stubbi}
+        return render_template('brukari.html',art=content, user=user, user_owner=user_owner)
     else:
         return render_template('error.html', error=f'{vangi} finst ikki')
 
@@ -437,67 +364,6 @@ def initdb_command():
             db.create_all()
             print('Initialized the database.')
 
-
-## USED TO HANDLE DATABASE TABLE INPUT ##
-## AND CLEAN DATA OUTPUT IN DICTIONARY ##      
-def rowToDict(row):
-    newDict = row.__dict__
-    del newDict['_sa_instance_state']
-    return newDict
-
-
-## USED TO GET NESTED ARTICLE DICTIONARY FROM DATABASE OUTPUT ##
-## CAN BE PARSED DIRECTLY INTO HTML AND USED WITH JINJA       ##
-def latest_articles_dict(databaseOutput):
-    # Create a list of dictionaries and number each one
-    dict_list = []
-    for i in databaseOutput:
-        artikkul_dict = rowToDict(i)
-        dict_list.append(artikkul_dict)
-    for i, d in enumerate(dict_list):
-        dict_list[i] = {i+1: d}
-
-    # Combine the list of dictionaries into a nested dictionary
-    nested_dict = {}
-    for d in dict_list:
-        nested_dict.update(d)
-    return nested_dict
-
-## USED TO ADD REALTIME TIMEDELTA TO HTML BASED ON TIMESTAMPING##
-def timeDelta(timestamp):
-    now = datetime.utcnow()
-    delta = now - timestamp
-    if delta < timedelta(days=1):
-        if delta < timedelta(hours=1):
-            return "Beint nú"
-        else:
-            hours_ago = int(delta.total_seconds() // 3600)
-            return f"{hours_ago} tímar síðan"
-    else:
-        if delta > timedelta(days=1) and delta < timedelta(days=2):
-            return "Í gjár"
-        else:
-            days_ago = delta.days
-            return f"{days_ago} dagar síðani"
-
-
-    ###THIS SECTION REMOVES ALL HTML SYNTAX FROM TEXT###
-def preview_article(text, preview_lenght=40):
-    print("text",text)
-    # Define the regular expression pattern to search for
-    pattern = r"<[^>]+>"
-    # Define the replacement string
-    replacement = ''
-    # Replace all occurrences of the pattern in the text with the replacement string
-    clean_text = re.sub(pattern, replacement, text)
-
-    ### THIS SECTION CUTS THE TEXT TO PREVIEW ###
-    words = clean_text.split()
-    if len(words) < preview_lenght:
-        return "<p>"+clean_text+"</p>"
-    else:
-        shortened_text = " ".join(words[:preview_lenght])
-        return "<p>"+shortened_text+"..."+"</p>"
 
 
 ## THIS LOADS CONTENT THAT IS AVAILABLE ON ALL PAGES ##
@@ -520,16 +386,6 @@ def inject_auth():
                     'vangi': user.vangi}
     return {'authenticated': False}
 
-
-@app.cli.command('test')
-def test():
-    vangi = "simun.hojgaard"
-    user = UserModel.query.filter(UserModel.vangi== vangi).join(Verification).filter(Verification.status == 'verified').first()
-    seinastu_artiklar_dbRaw = artiklar.query.join(Verification).filter(Verification.status == 'verified').join(artiklar.author).filter_by(telefon=user.telefon).all()
-    #seinastu_artiklar_dbRaw = artiklar.query.filter(artiklar.telefon == user.telefon).join(Verification).filter(Verification.status == 'verified').order_by(artiklar.created_stamp.desc()).limit(10).all()
-    print(rowToDict(user))
-    print(latest_articles_dict( seinastu_artiklar_dbRaw))
-
 @app.cli.command('cmdb')
 def cmdb():
 
@@ -547,34 +403,14 @@ def cmdb():
     telefon = ["126232","438303","238603","196824","143876"]
     skriv = loremipsum
     picture_path = ["3dcdeb74-MJ.jpg", "87457ab892-headshot.jpg", "87457ab892-headshot2.jpg", "87457ab892-arnold.jpg", "b641ab7e-simun.jpg"]
+    user_id = ["1000000001","1000000002","1000000003","1000000004","1000000005"]
     # retrieve the row to duplicate
 
     import random
     # create 20 duplicates of the row with new IDs
-    for i in range(20):
-
-        random_number = random.randint(0, 4)
-        new_id = 10000000 + i + 1  # generate a new ID for each duplicate
-
-
-        nytt_skriv = artiklar(
-            art_id=str(new_id),
-            fornavn=fornavn[random_number],
-            efturnavn=efturnavn[random_number],
-            stovnur=stovnur[random_number],
-            telefon=telefon[random_number],
-            picture_path=picture_path[random_number],
-            yvirskrift=f"Yvirskrift Nummar {i}",
-            skriv="<p>"+loremipsum+"</p>",
-            created_stamp = datetime.utcnow(),
-            )
-        db.session.add(nytt_skriv)
-        db.session.commit()
-        whitelist(str(new_id), "whitelist")
     for i in range(5):
-        new_id = 1000000000 + i + 1
         brukari = UserModel(
-            user_id = str(new_id),
+            user_id = user_id[i],
             email=fornavn[i].lower()+efturnavn[i].lower()+"@gmail.com",
             fornavn=fornavn[i],
             efturnavn=efturnavn[i],
@@ -587,7 +423,23 @@ def cmdb():
         )
         db.session.add(brukari)
         db.session.commit()
-        whitelist(str(new_id), "whitelist")
+    for i in user_id:
+        whitelist(str(i), "whitelist")
         
+    for i in range(20):
+
+        random_number = random.randint(0, 4)
+        new_id = 10000000 + i + 1  # generate a new ID for each duplicate
+
+
+        nyggj_grein = Grein(
+            grein_id=str(new_id),
+            yvirskrift=f"Yvirskrift Nummar {i}",
+            grein="<p>"+loremipsum+"</p>",
+            author_id = user_id[random_number]
+            )
+        db.session.add(nyggj_grein)
+        db.session.commit()
+        #whitelist(str(new_id), "whitelist")
 if __name__ == "__main__":
     app.run(debug=True)

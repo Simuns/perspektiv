@@ -1,5 +1,4 @@
-// LOAD DEPENDENCIES
-const sources = [
+var sources = sources || [
   {
     type: 'script',
     src: 'https://code.jquery.com/jquery-3.6.0.min.js',
@@ -21,7 +20,7 @@ const sources = [
 for (let i = 0; i < sources.length; i++) {
   const source = sources[i];
   const existing = document.querySelector(`${source.type}[src="${source.src}"],${source.type}[href="${source.href}"]`);
-  
+
   if (!existing) {
     const newSource = document.createElement(source.type);
 
@@ -44,14 +43,7 @@ for (let i = 0; i < sources.length; i++) {
   }
 }
 
-
-// Create the script element for Quill
-const quillScript = document.createElement('script');
-quillScript.src = 'https://cdn.quilljs.com/1.3.6/quill.js';
-
-// Add an onload event listener to the Quill script
-quillScript.onload = function() {
-  // This code will run after Quill has finished loading
+function initQuill() {
   const quill = new Quill('#editor', {
     modules: {
       toolbar: [
@@ -65,17 +57,12 @@ quillScript.onload = function() {
     },
     theme: 'snow'
   });
-  /*
-  $('#skriva').submit(function(event) {
-    var contents = quill.getContents();
-    $('#hiddenArea').val($('#editor .ql-editor').html());
-  });
-  */
-    $('.postButton').click(function(event) {
+  $('.postButton').click(function(event) {
     event.preventDefault(); // prevent the form from submitting normally
-    var contents = quill.getContents();
+    var contents = JSON.stringify(quill.getContents());
+    console.log(contents)
     $.ajax({
-      url: '/ppost-grein',
+      url: '/post-grein',
       type: 'POST',
       data: { contents: contents },
       success: function(response) {
@@ -86,10 +73,14 @@ quillScript.onload = function() {
       }
     });
   });
-};
+}
 
-// Add the Quill script to the document head
-document.head.appendChild(quillScript);
-
-
-
+// Check if Quill is already loaded before appending the script
+if (window.Quill) {
+  initQuill();
+} else {
+  var quillScript = quillScript || document.createElement('script');
+  quillScript.src = 'https://cdn.quilljs.com/1.3.6/quill.js';
+  quillScript.onload = initQuill;
+  document.head.appendChild(quillScript);
+}

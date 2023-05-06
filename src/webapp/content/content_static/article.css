@@ -1,0 +1,31 @@
+.floatingBox.open {
+    padding:15px;
+
+}
+.art-header{
+    display: flex;
+    height: 320px;
+    margin-bottom: 20px;
+    position: relative;
+}
+.art-date{
+    position: absolute;
+    top: 0;
+    font-size: 17px;
+}
+.art-picture {
+    width: auto;
+    text-align: right;   
+}
+
+.art-picture img{
+    max-height:300px;
+    max-width:300px;
+    height:auto;
+    width:auto;
+    border-radius: 25%
+
+}
+.art-info{
+    flex: 1;
+}

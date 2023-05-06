@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block head %}
+        <title>Rita inn</title>
+        <link rel="stylesheet" href="{{ url_for('user.static', filename='ritainn.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="main-ritainn">
+    
+    
+    <form action="" method = "POST">
+        <p>Post addressa<input type = "email" name = "email" /></p>
+        <p>Loyniorð<input type = "password" name = "password" /></p>
+        <p>Rita inn<input type = "submit" value = "Submit" /></p>
+    </form>
+    <h3>Manglar tú konto?</h3>
+    <h3><a href = "{{url_for('user.register') }}">Upprætta teg her</a></h3>
+</div>
+{% endblock %}
+
+
+
+

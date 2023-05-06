@@ -1,0 +1,105 @@
+
+<div class="edit-open" id="navn">
+    <div class="nøvn">
+        <form class="um_meg_form">
+            <p>Fornavn <input type = "fornavn" name = "fornavn" value="{{ user.fornavn }}" /></p>
+            <p>Efturnavn <input type = "efturnavn" name = "efturnavn" value="{{ user.efturnavn }}"/></p>
+            <div class="knappar">
+                <div class="goymKnappurDiv">
+                    <button class="goymKnappur" type="submit" >Goym broytingar</button>
+                </div>
+                <div class="closeKnappurdiv">
+                    <button class="closeKnappur" type="submit" >Lat aftur</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="message"><p></p></div>
+</div>
+
+<div class="edit-open" id="stovnur">
+    <form class="um_meg_form">
+        <p>stovnur/felagskapur <input type = "text" name = "stovnur" value="{{ user.stovnur }}" /></p>
+        <div class="knappar">
+            <div class="goymKnappurDiv">
+                <button class="goymKnappur" type="submit" >Goym broytingar</button>
+            </div>
+            <div class="closeKnappurdiv">
+                <button class="closeKnappur" type="submit" >Lat aftur</button>
+            </div>
+        </div>
+    </form>
+    <div class="message"><p></p></div>
+</div>
+
+<div class="edit-open" id="telefon">
+    <p>Fyri at broyta telefon nummar, er neyðugt at vátta nýggja nummari.<br>
+        Hetta kann gerast við vátta kodu sum blívur send til nýggja nummari.
+    </p>
+    <form class="um_meg_form">
+        <p>Telefon nummar <input type = "text" name = "telefon" value="{{ user.telefon }}"/></p>
+        <div class="knappar">
+            <div class="goymKnappurDiv">
+                <button class="goymKnappur" type="submit" >Goym broytingar</button>
+            </div>
+            <div class="closeKnappurdiv">
+                <button class="closeKnappur" type="submit" >Lat aftur</button>
+            </div>
+        </div>
+    </form>
+    <div class="message"><p></p></div>
+</div>
+<div class="edit-open" id="email">
+    <form class="update-email">
+        <p>Post adressa <input type = "text" name = "email" value="{{ user.email }}"/></p>
+        <div class="knappar">
+            <div class="goymKnappurDiv">
+                <button class="goymKnappur" type="submit" >Goym broytingar</button>
+            </div>
+            <div class="closeKnappurdiv">
+                <button class="closeKnappur" type="submit" >Lat aftur</button>
+            </div>
+        </div>
+    </form>
+    <div class="message"><p></p></div>
+</div>
+<div class="edit-open" id="vangi">
+    <form class="um_meg_form">
+        <p>Vanga addressa <input type = "text" name = "vangi" value="{{ user.vangi }}"/></p>
+        <div class="knappar">
+            <div class="goymKnappurDiv">
+                <button class="goymKnappur" type="submit" >Goym broytingar</button>
+            </div>
+            <div class="closeKnappurdiv">
+                <button class="closeKnappur" type="submit" >Lat aftur</button>
+            </div>
+        </div>
+    </form>
+    <div class="message"><p></p></div>
+</div>
+<div class="edit-open" id="mynd">
+    <form id="upload-form">
+        <label for="file">Vel eina vangamynd:</label><br>
+        <input type="hidden" name="session_id" value="{{user.user_id}}">
+        <input type="file" name="picture" >
+        <button class="btn" type="submit" >Upload</button><br>
+        <script src="{{ url_for('static', filename='upload.js') }}"></script>
+        <div id="message"></div>
+    </form>
+    {% if user.picture_path %}
+    <img id="large-image-preview" src="{{ url_for('static', filename='uploads/' + 'large-' + user.picture_path) }}" alt="">
+    {% else %}
+    <img id="large-image-preview" src="" alt="">
+    {% endif %}
+    <div class="closeKnappurdiv">
+        <button class="closeKnappur" type="submit" >Lat aftur</button>
+    </div>
+    <div class="message"><p></p></div>
+</div>
+<div class="edit-open" id="loyniord">
+    <p>ger ein knapp her til send email við password change logic.</p>
+    <div class="closeKnappurdiv">
+        <button class="closeKnappur" type="submit" >Lat aftur</button>
+    </div>
+    <div class="message"><p></p></div>
+</div>

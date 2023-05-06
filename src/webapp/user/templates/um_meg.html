@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block head %}
+        <title>Um meg</title>
+        <link rel="stylesheet" href="{{ url_for('user.static', filename='um_meg.css') }}">
+{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+
+
+<div class="main-um_meg">
+
+    <div class="editables">
+        <div class="edit" id="navn">
+            <div class="edit-box">
+                <span class="edit-item">navn:</span> <span class="edit-result"> {{user.fornavn}} {{user.efturnavn}}</span> <br>
+            </div>
+            <div class="edit-link"><span>broyt</span></div>
+        </div>
+        <div class="edit" id="stovnur">
+            <div class="edit-box">
+                <span class="edit-item">stovnur/felagskapur: </span><span class="edit-result"> {{user.stovnur}}</span>
+            </div>
+            <div class="edit-link"><span>broyt</span></div>
+        </div>
+        <div class="edit" id="telefon">
+            <div class="edit-box">
+                <span class="edit-item">Telefon Nummar:</span> <span class="edit-result"> {{ user.telefon}}</span>
+            </div>
+            <div class="edit-link"><span>broyt</span></div>
+        </div>
+        <div class="edit" id="email">
+            <div class="edit-box">
+                <span class="edit-item">Post adressa:</span> <span class="edit-result"> {{ user.email}}</span>
+            </div>
+            <div class="edit-link"><span>broyt</span></div>
+        </div>
+        <div class="edit" id="vangi">
+            <div class="edit-box">
+                <span class="edit-item">vangi:</span> <span class="edit-result"> {{ user.vangi}}</span>
+            </div>
+            <div class="edit-link"><span>broyt</span></div>
+        </div>
+        <div class="edit" id="mynd">
+            <span class="edit-item">Dagfør Vangamynd</span>
+            <div class="edit-link"><span>broyt</span></div>
+        </div>
+        <div class="edit" id="loyniord">
+            <div class="edit-box">
+                <span class="edit-item">Broyt Loyniorð</span>
+            </div>
+            <div class="edit-link"><span>broyt</span></div>
+        </div>
+        <script src="{{ url_for('user.static', filename='editbox.js') }}"></script>
+    </div>
+
+</div>
+{% endblock %}

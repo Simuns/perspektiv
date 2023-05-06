@@ -18,8 +18,8 @@
 
 
 {% block content %}
-{% include "base-prev.html" %}
+{% include 'base-prev.html' %}
                 <div class="floatingBox-Placeholder" id="placeholder"></div>
-                <script src="{{ url_for('static', filename='onBottom.js') }}"></script>
-                <script src="{{ url_for('static', filename='click-floatingBox.js') }}"></script>
+                <script src="{{ url_for('content.static', filename='onBottom.js') }}"></script>
+                <script src="{{ url_for('content.static', filename='click-floatingBox.js') }}"></script>
 {% endblock %}

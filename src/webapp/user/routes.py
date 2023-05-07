@@ -1,7 +1,7 @@
 from flask import Blueprint, request, render_template, redirect, jsonify, url_for
 from webapp.database import db, Grein, Verification, UserModel, login, Stubbi
 import uuid
-from webapp.serve_content import serve_grein, serve_stubbi
+from webapp.serve_content import serve_content, query_latest_content, sort_unionQuery
 from webapp.verify import send_verification
 from flask_login import login_required, current_user, login_user, logout_user
 from .utils import set_vangi
@@ -137,14 +137,9 @@ def brukari(vangi):
             if current_user.user_id == user.user_id:
                 user_owner = True
         article_count = Grein.query.join(UserModel).filter(UserModel.user_id == Grein.author_id).order_by(Grein.created_stamp.desc()).count()
-        if article_count == 0:
-            return render_template('brukari.html', art=False, user=user, user_owner=user_owner)
-        art = serve_grein(Grein.query.join(UserModel).filter(user.user_id == Grein.author_id).order_by(Grein.created_stamp.desc()).all())
-        stubbi = serve_stubbi(Stubbi.query.join(UserModel).filter(user.user_id == Stubbi.author_id).order_by(Stubbi.created_stamp.desc()).all())
-        content= {**art, **stubbi}
+        user_content = query_latest_content(user.user_id)
+        sorted_user_content = sort_unionQuery(user_content)
+        content = serve_content(sorted_user_content)
         return render_template('brukari.html',art=content, user=user, user_owner=user_owner)
     else:
         return render_template('error.html', error=f'{vangi} finst ikki')
-
-
-        return render_template('brukari.html')

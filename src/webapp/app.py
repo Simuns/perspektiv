@@ -1,32 +1,12 @@
 #flask and database support
-from flask import Flask, render_template, request, jsonify, make_response, redirect, url_for, send_from_directory, Blueprint
+from flask import Flask, send_from_directory
 #loading settings defined in the settings.yaml file
 from webapp.settings import app_config 
-# handling of verification
-# database dependencies
-from webapp.database import db, Grein, Verification, UserModel, login, Stubbi
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import exc, text, desc
-# Used to handle quill editor data, which for some reason doesnt work with request.json
-import json
-#image commpression
+from datetime import datetime
 
-# Used for creating id's for articles
-import uuid
-
-#datetime for timestampings
-from datetime import datetime, timedelta
-
+from webapp.database import db, Grein, UserModel, login
+from sqlalchemy import exc, text
 import os
-
-# handle login events
-from flask_login import login_required, current_user, login_user, logout_user
-# Load settings defined in config.yaml
-#regex
-import re
-
-
-
 
 app = Flask(__name__)
 
@@ -34,14 +14,14 @@ app = Flask(__name__)
 from webapp.user.routes import user_bp
 from webapp.post.routes import post_bp
 from webapp.content.routes import content_bp
+from webapp.main.routes import main_bp
+app.register_blueprint(main_bp)
 app.register_blueprint(user_bp)
 app.register_blueprint(post_bp)
 app.register_blueprint(content_bp)
 
 #importing webapp after initialization of app
-from webapp.verify import send_verification, verify, whitelist
-from webapp.process_picture import compress_picture, save_picture
-from webapp.serve_content import serve_grein, serve_content, rowToDict, sort_unionQuery, query_latest_content
+from webapp.verify import whitelist
 
 app_config = app_config()
 # THE SECRET IS USED FOR CREATING CLIENT SESSIONS AND ENCRYPTING THEM
@@ -80,47 +60,9 @@ with app.app_context():
         print('Initialized the database.')
 
 
-
-
-@app.route('/')
-def index():
-    latest_content = query_latest_content()
-    print(latest_content.all())
-    sorted_content = sort_unionQuery(latest_content)
-    art = serve_content(sorted_content)
-    return render_template('index.html',art=art)
-
-
-
-
-
-
-
-@app.route('/upload', methods=['POST'])
-def upload():
-    if 'picture' not in request.files:
-        return jsonify({'error': 'No picture provided'}), 400
-
-    ## fetch data from /upload path ##
-    picture = request.files['picture']
-    session_id = request.form['session_id']
-
-    ## compress picture
-    picture_filename_jpg = compress_picture(picture, session_id )
-    ## Save path in database
-    print("saving path")
-    save_picture(session_id, picture_filename_jpg)
-    response_data = {
-            'success': True,
-            'url': url_for('static', filename="uploads/large-" + picture_filename_jpg)
-            }
-    response = make_response(jsonify(response_data))
-    response.status_code = 200
-    return response
-
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'),
+    return send_from_directory(os.path.join(main_bp.root_path, 'static'),
                                 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
@@ -139,33 +81,6 @@ def initdb_command():
             db.create_all()
             print('Initialized the database.')
 
-
-
-## THIS LOADS CONTENT THAT IS AVAILABLE ON ALL PAGES ##
-## I NEED USER AUTHENTICATION STATUS TO BE AWARE IF  ##
-## LOGIN BUTTON SHOULD EXSIST OR NOT                 ##
-@app.context_processor
-def inject_auth():
-    if current_user.is_authenticated:
-        user = UserModel.query.get(current_user.user_id)
-        if user.picture_path:
-            return {'authenticated': True, 
-                    'picture': user.picture_path,
-                    'fornavn': user.fornavn,
-                    'vangi': user.vangi}
-        else:
-            initials = user.fornavn[0].upper() + user.efturnavn[0].upper()
-            return {'authenticated': True, 
-                    'initials': initials,
-                    'fornavn': user.fornavn,
-                    'vangi': user.vangi}
-    return {'authenticated': False}
-
-
-@app.cli.command('test')
-def test():
-    print("testing area")
-    
 @app.cli.command('cmdb')
 def cmdb():
 
